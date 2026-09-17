@@ -344,13 +344,16 @@ async function fetchLlamaHistory(address, points=48) {
 
 // Load local cached history via API
 async function fetchLocalHistory(address) {
+  console.log('fetchLocalHistory called for', address);
   try {
     const r = await fetch(`${BASE}/api/chart/${address}?points=1440`);
+    console.log('fetchLocalHistory response:', r.status);
     if (r.ok) {
       const d = await r.json();
+      console.log('fetchLocalHistory points:', d.points.length);
       return d.points || [];
     }
-  } catch {}
+  } catch(e) { console.error('fetchLocalHistory error:', e); }
   return [];
 }
 
@@ -592,7 +595,9 @@ async function openModal(idx) {
 }
 
 async function renderRealChart(t) {
+  console.log('renderRealChart called', t.sym, 'addr=' + t.addr, 'price=' + t.price);
   const box = document.getElementById('chart-box');
+  console.log('box element:', box, 'clientWidth=', box.clientWidth, 'clientHeight=', box.clientHeight);
   box.innerHTML = '';
   if (charts[t.addr]) { charts[t.addr].remove(); delete charts[t.addr]; }
 
@@ -607,11 +612,13 @@ async function renderRealChart(t) {
   // Ensure container has size before creating chart
   if (box.clientWidth === 0) box.style.width = '100%';
   const chartW = box.clientWidth || 700;
+  console.log('Creating chart, box size:', box.clientWidth, 'x', box.clientHeight);
   const chart = LightweightCharts.createChart(box, {
     layout: { background: { color: '#0a0a15' }, textColor: '#555', fontSize: 11 },
     grid: { vertLines: { color: '#1a1a2e' }, horzLines: { color: '#1a1a2e' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightAxis: { borderColor: '#1a1a2e', tickAlign: 'left' },
+    rightAxis: { borderColor: '#1a1a2e', tickAlign: 'left', priceFormat: { type: 'price', precision, minMove } },
+    leftAxis: { visible: true, borderColor: '#1a1a2e' },
     timeScale: { borderColor: '#1a1a2e', timeVisible: true, secondsVisible: false, rightOffset: 2 },
     width: chartW, height: 260
   });
@@ -625,6 +632,7 @@ async function renderRealChart(t) {
     priceFormat: { type: 'price', precision, minMove },
     priceLine: { labeled: true, labelBackgroundColor: lineColor },
     lastValueLabel: { visible: true, labelBackgroundColor: lineColor },
+    priceScaleId: 'right',
   });
 
   // Volume histogram
@@ -635,6 +643,7 @@ async function renderRealChart(t) {
     priceFormat: { type: 'volume' },
     priceLine: { visible: false },
     lastValueLabel: { visible: false },
+    priceScaleId: 'left',
   });
 
   // Primary: fetch local accumulated history (most reliable)
@@ -646,16 +655,20 @@ async function renderRealChart(t) {
     if (llama.length >= 3) history = llama;
   }
 
+  console.log('History points:', history.length, 'first:', history[0], 'last:', history[-1]);
   if (history.length >= 3) {
     line.setData(history);
+    console.log('Data set successfully');
     // Volume bars from price changes
     const volData = [];
     for (let i = 1; i < history.length; i++) {
       const chg = history[i].value - history[i-1].value;
+      // Scale volume to fit nicely in left axis (0-100 range)
+      const volVal = Math.min(100, Math.max(1, Math.abs(chg) / price * 100));
       volData.push({
         time: history[i].time,
-        value: Math.max(0.001, Math.abs(chg) * 1000000),
-        color: chg >= 0 ? volBorder : volColor.replace('0.15', '0.3').replace('0.4', '0.6'),
+        value: volVal,
+        color: chg >= 0 ? 'rgba(74,222,128,0.25)' : 'rgba(248,113,113,0.25)',
       });
     }
     if (volData.length) volSeries.setData(volData);
