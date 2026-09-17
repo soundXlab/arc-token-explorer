@@ -599,6 +599,11 @@ async function renderRealChart(t) {
   const box = document.getElementById('chart-box');
   console.log('box element:', box, 'clientWidth=', box.clientWidth, 'clientHeight=', box.clientHeight);
   box.innerHTML = '';
+  // Debug overlay
+  const debugEl = document.createElement('div');
+  debugEl.id = 'chart-debug';
+  debugEl.style.cssText = 'position:absolute;top:4px;left:4px;font-size:10px;color:#888;background:rgba(0,0,0,0.7);padding:2px 6px;border-radius:4px;z-index:10;pointer-events:none';
+  box.appendChild(debugEl);
   if (charts[t.addr]) { charts[t.addr].remove(); delete charts[t.addr]; }
 
   // Dynamic precision based on price
@@ -656,9 +661,11 @@ async function renderRealChart(t) {
   }
 
   console.log('History points:', history.length, 'first:', history[0], 'last:', history[-1]);
+  if (debugEl) debugEl.textContent = 'Points: ' + history.length;
   if (history.length >= 3) {
     line.setData(history);
     console.log('Data set successfully');
+    if (debugEl) debugEl.textContent = 'Chart rendered: ' + history.length + ' pts';
     // Volume bars from price changes
     const volData = [];
     for (let i = 1; i < history.length; i++) {
