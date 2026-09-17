@@ -69,6 +69,12 @@ a{color:var(--accent);text-decoration:none}
 .card-desc{font-size:10px;color:var(--muted);margin-top:1px}
 .badge-new{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;background:rgba(74,222,128,0.2);color:var(--green)}
 .badge-known{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;background:rgba(102,126,234,0.2);color:var(--accent)}
+.badge-risk{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:800;margin-left:4px}
+.badge-a{background:rgba(74,222,128,0.25);color:#4ade80}
+.badge-b{background:rgba(74,222,128,0.15);color:#86efac}
+.badge-c{background:rgba(251,191,36,0.2);color:#fbbf24}
+.badge-d{background:rgba(251,146,60,0.2);color:#fb923c}
+.badge-f{background:rgba(248,113,113,0.25);color:#f87171}
 .card-price{font-size:22px;font-weight:800;color:#fff}
 .card-chg{font-size:13px;font-weight:700}
 .card-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
@@ -386,7 +392,8 @@ async function refreshAll() {
 
   allData = results.filter(r=>(r.dex||r.gecko) && r.addr).map(r => {
     const price = llama[r.addr.toLowerCase()] || r.gecko?.price || r.dex?.price;
-    return {...r, price, mcap:r.gecko?.mcap||r.dex?.mcap, fdv:r.gecko?.fdv||r.dex?.fdv, vol:r.gecko?.vol24||r.dex?.vol, chg:r.gecko?.chg24??r.dex?.chg24, chg7d:r.gecko?.chg7d, img:imgMap[r.addr.toLowerCase()] || r.dex?.info?.imageUrl || null};
+    const rs = r.risk_score || {};
+    return {...r, price, mcap:r.gecko?.mcap||r.dex?.mcap, fdv:r.gecko?.fdv||r.dex?.fdv, vol:r.gecko?.vol24||r.dex?.vol, chg:r.gecko?.chg24??r.dex?.chg24, chg7d:r.gecko?.chg7d, img:imgMap[r.addr.toLowerCase()] || r.dex?.info?.imageUrl || null, risk_grade:rs.grade||null, risk_score:rs.score||50};
   }).sort((a,b)=>(b.mcap||0)-(a.mcap||0));
   
   // Also load discovered tokens from API that aren't in TOKEN_DEFS
@@ -396,7 +403,7 @@ async function refreshAll() {
     for (const t of disc) {
       const sym = (t.symbol||'').toUpperCase();
       if (!knownSyms.has(sym) && t.address && t.price > 0 && (t.mcap||0) > 1000) {
-        allData.push({sym, desc:t.name||sym, addr:t.address.toLowerCase(), price:t.price, mcap:t.mcap||0, fdv:t.fdv||0, vol:t.vol_24h||0, chg:t.chg_24h||0, chg7d:null, isKnown:false, dex:{}, gecko:{}});
+        allData.push({sym, desc:t.name||sym, addr:t.address.toLowerCase(), price:t.price, mcap:t.mcap||0, fdv:t.fdv||0, vol:t.vol_24h||0, chg:t.chg_24h||0, chg7d:null, isKnown:false, dex:{}, gecko:{}, risk_score:t.risk_score||{score:50,grade:'C'}, risk_grade:(t.risk_score||{}).grade||'C'});
       }
     }
     allData.sort((a,b)=>(b.mcap||0)-(a.mcap||0));
@@ -431,6 +438,12 @@ function renderStats() {
   const avgChg = allData.length ? allData.reduce((s,t)=>s+(t.chg||0),0)/allData.length : 0;
   const gainers = allData.filter(t=>(t.chg||0)>0).length;
   const discovered = discoveryInfo?.discovered || 0;
+  // Risk stats
+  const riskScores = allData.map(t=>t.risk_score?.score||50);
+  const avgRisk = riskScores.length ? Math.round(riskScores.reduce((a,b)=>a+b,0)/riskScores.length) : 50;
+  const riskA = riskScores.filter(s=>s<=20).length;
+  const riskF = riskScores.filter(s=>s>80).length;
+  const riskDist = `${riskA}A/${riskF}F`;
 
   document.getElementById('stats').innerHTML = [
     {l:'Tokens',v:allData.length,s:`${discovered} discovered`},
@@ -439,6 +452,7 @@ function renderStats() {
     {l:'Avg Chg',v:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%',c:avgChg>=0?'up':'down',s:avgChg>=0?'↑ bullish':'↓ bearish'},
     {l:'Gainers',v:gainers,s:`${allData.length-gainers} losers`},
     {l:'Discovered',v:discovered,s:'auto-scanned'},
+    {l:'Avg Risk',v:avgRisk,s:riskDist,s:'',c:avgRisk<=30?'up':avgRisk<=50?'':'down'},
   ].map(s=>`<div class="stat"><div class="stat-l">${s.l}</div><div class="stat-v ${s.c||''}">${s.v}</div><div class="stat-sub ${s.c||''}">${s.s||''}</div></div>`).join('');
 }
 
@@ -453,6 +467,7 @@ function renderTokens(id, data) {
 <img class="card-img" src="${t.img || ''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="card-img" style="display:${t.img ? 'none' : 'flex'}">${t.sym[0]}</div>
         <div class="card-info"><div class="card-name">${t.sym}</div><div class="card-desc">${t.desc}</div></div>
         ${t.isKnown?'<span class="badge-known">KNOWN</span>':'<span class="badge-new">NEW</span>'}
+        ${t.risk_grade ? `<span class="badge-risk badge-${t.risk_grade.toLowerCase()}">${t.risk_grade}</span>` : ''}
       </div>
       <div class="card-price">${fmtPrice(t.price)}</div>
       <div class="card-chg ${chgCls}">${chgVal} <span style="font-size:10px;color:var(--muted)">24h</span></div>
