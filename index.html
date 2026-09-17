@@ -3,224 +3,488 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arc Explorer — Live Data Dashboard</title>
+<title>Arc Token Explorer — Live Dashboard</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0a0a1a;
-  color: #e0e0e0;
-  min-height: 100vh;
+:root {
+  --bg: #06060f; --card: #0d0d1a; --border: #1a1a2e;
+  --text: #e0e0e8; --muted: #555; --accent: #667eea;
+  --green: #4ade80; --red: #f87171; --purple: #c084fc;
 }
-.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
-header { margin-bottom: 32px; }
-h1 { font-size: 28px; color: #fff; margin-bottom: 8px; }
-.subtitle { color: #666; font-size: 14px; }
-.status {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: #1a1a2e; padding: 6px 12px; border-radius: 20px;
-  font-size: 12px; color: #888;
+body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+a { color: var(--accent); text-decoration: none; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 100%);
+  border-bottom: 1px solid var(--border); padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
 }
-.pulse { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.chain-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
-.grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.logo h1 { font-size: 18px; font-weight: 700; color: #fff; }
+.logo span { font-size: 11px; color: var(--muted); }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,0.4)} 50%{opacity:0.8;box-shadow:0 0 0 6px rgba(74,222,128,0)} }
+.status-text { font-size: 12px; color: var(--muted); }
+.refresh-btn {
+  background: var(--border); border: 1px solid #2a2a4a; color: var(--text);
+  padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Main Layout */
+.main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+/* Network Stats Bar */
+.net-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px; margin-bottom: 24px;
 }
-.card {
-  background: #111122; border-radius: 12px; padding: 16px;
-  border: 1px solid #1e1e3a;
+.net-stat {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px;
 }
-.card-title { color: #555; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.card-value { color: #fff; font-size: 22px; font-weight: 700; }
-.card-sub { color: #4ade80; font-size: 11px; margin-top: 2px; }
-.section-title { font-size: 16px; color: #fff; margin-bottom: 12px; }
-.tokens-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tokens-table th {
-  background: #111122; color: #555; padding: 10px 12px; text-align: left;
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+.net-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+.net-stat-value { font-size: 20px; font-weight: 700; color: #fff; }
+.net-stat-sub { font-size: 11px; color: var(--green); margin-top: 2px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab {
+  padding: 10px 20px; cursor: pointer; font-size: 13px; color: var(--muted);
+  border-bottom: 2px solid transparent; transition: all 0.15s;
 }
-.tokens-table td { padding: 10px 12px; border-bottom: 1px solid #1a1a2e; }
-.tokens-table tr:hover td { background: #0d0d1f; }
-.token-name { display: flex; flex-direction: column; }
-.token-sym { color: #fff; font-weight: 600; font-size: 13px; }
-.token-desc { color: #444; font-size: 10px; margin-top: 2px; }
-.badge {
-  display: inline-block; padding: 2px 6px; border-radius: 3px;
-  font-size: 9px; font-weight: 600;
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Token Grid */
+.token-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }
-.badge-utility { background: #0f2b1f; color: #4ade80; }
-.badge-meme { background: #1f0f2b; color: #c084fc; }
-.price { font-family: 'Courier New', monospace; font-size: 12px; }
-.up { color: #4ade80; }
-.down { color: #f87171; }
-.loading { text-align: center; padding: 32px; color: #333; }
-.error { text-align: center; padding: 16px; color: #f87171; background: #1a0a0a; border-radius: 8px; font-size: 12px; }
-footer { margin-top: 24px; color: #333; font-size: 11px; text-align: center; }
+.token-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px; cursor: pointer; transition: all 0.15s;
+}
+.token-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(102,126,234,0.1); }
+.token-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.token-img { width: 40px; height: 40px; border-radius: 50%; background: var(--border); overflow: hidden; }
+.token-img img { width: 100%; height: 100%; object-fit: cover; }
+.token-info { flex: 1; }
+.token-name { font-weight: 700; font-size: 15px; color: #fff; }
+.token-symbol { font-size: 11px; color: var(--muted); }
+.token-type-badge {
+  font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-utility { background: rgba(74,222,128,0.1); color: var(--green); }
+.badge-meme { background: rgba(192,132,252,0.1); color: var(--purple); }
+.token-price { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.token-change { font-size: 13px; font-weight: 600; }
+.change-up { color: var(--green); }
+.change-down { color: var(--red); }
+.token-meta {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
+  padding-top: 12px; border-top: 1px solid var(--border);
+}
+.meta-item { font-size: 11px; }
+.meta-label { color: var(--muted); }
+.meta-value { color: var(--text); font-weight: 600; }
+
+/* Chart Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto;
+}
+.modal-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 18px; font-weight: 700; color: #fff; }
+.modal-close {
+  background: var(--border); border: none; color: var(--text);
+  width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px;
+}
+.modal-body { padding: 24px; }
+.chart-container { width: 100%; height: 300px; margin-bottom: 20px; border-radius: 12px; overflow: hidden; }
+.modal-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.modal-stat { background: var(--bg); border-radius: 10px; padding: 12px; }
+.modal-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+.modal-stat-value { font-size: 16px; font-weight: 700; color: #fff; margin-top: 2px; }
+.modal-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+.modal-btn {
+  padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #5568d8; }
+.btn-secondary { background: var(--border); color: var(--text); border: 1px solid #2a2a4a; }
+.btn-secondary:hover { border-color: var(--accent); }
+
+/* Volume Bar */
+.vol-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 4px; }
+.vol-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--purple)); }
+
+/* Loading */
+.loading { text-align: center; padding: 48px; color: var(--muted); }
+.loading::after { content: '…'; animation: dots 1.5s infinite; }
+@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+/* Tabs content */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Footer */
+.footer { margin-top: 40px; padding: 20px; text-align: center; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
+.footer a { color: var(--accent); }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-      <div class="chain-badge">ARC MAINNET</div>
-      <div class="status"><div class="pulse"></div>Live Data</div>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">◆</div>
+    <div>
+      <h1>Arc Explorer</h1>
+      <span>Live Dashboard · Arc Mainnet · Chain ID 5042</span>
     </div>
-    <h1>Arc Token Explorer</h1>
-    <p class="subtitle">Real-time prices from DexScreener · Auto-refreshes every 60s</p>
-  </header>
+  </div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="status-dot"></div>
+      <span class="status-text" id="status-text">Connecting…</span>
+    </div>
+    <button class="refresh-btn" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+</div>
 
-  <div class="grid" id="stats"></div>
+<div class="main">
+  <div class="net-stats" id="net-stats"></div>
 
-  <div class="section-title">Tokens on Arc</div>
-
-  <div class="card" style="overflow-x:auto;">
-    <table class="tokens-table">
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>Type</th>
-          <th>Price</th>
-          <th>MCap</th>
-          <th>FDV</th>
-          <th>Vol 24h</th>
-          <th>Chg 24h</th>
-        </tr>
-      </thead>
-      <tbody id="tokens-body">
-        <tr><td colspan="7" class="loading">Loading tokens…</td></tr>
-      </tbody>
-    </table>
+  <div class="tabs">
+    <div class="tab active" data-tab="tokens">🪙 Tokens</div>
+    <div class="tab" data-tab="gainers">📈 Top Movers</div>
+    <div class="tab" data-tab="volume">💰 Volume Leaders</div>
+    <div class="tab" data-tab="about">ℹ️ About Arc</div>
   </div>
 
-  <footer>
-    Data: <a href="https://dexscreener.com" target="_blank" style="color:#555;">DexScreener</a> · 
-    Built for <a href="https://dorahacks.io/hackathon/arc-microgrants" target="_blank" style="color:#555;">Arc Microgrants</a>
-  </footer>
+  <div id="tab-tokens" class="tab-content active">
+    <div class="token-grid" id="token-grid"></div>
+  </div>
+  <div id="tab-gainers" class="tab-content">
+    <div class="token-grid" id="gainers-grid"></div>
+  </div>
+  <div id="tab-volume" class="tab-content">
+    <div class="token-grid" id="volume-grid"></div>
+  </div>
+  <div id="tab-about" class="tab-content">
+    <div class="card" style="padding:24px;">
+      <h2 style="color:#fff;margin-bottom:16px;">About Arc Network</h2>
+      <p style="color:#999;line-height:1.8;margin-bottom:16px;">
+        Arc is an EVM-compatible Layer 1 blockchain built by Circle, purpose-built for stablecoin finance.
+        It uses USDC as the native gas token and offers sub-second deterministic finality.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div class="net-stat"><div class="net-stat-label">Chain ID</div><div class="net-stat-value">5042</div></div>
+        <div class="net-stat"><div class="net-stat-label">Native Gas</div><div class="net-stat-value">USDC</div></div>
+        <div class="net-stat"><div class="net-stat-label">Finality</div><div class="net-stat-value">~1.5s</div></div>
+        <div class="net-stat"><div class="net-stat-label">Launched</div><div class="net-stat-value">Sep 16, 2026</div></div>
+      </div>
+      <div style="margin-top:20px;">
+        <h3 style="color:#fff;margin-bottom:12px;">Key Metrics (Live)</h3>
+        <div id="arc-metrics" style="color:#666;font-size:13px;line-height:2;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Token Detail Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Token</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="chart-container" id="chart-container"></div>
+      <div class="modal-stats" id="modal-stats"></div>
+      <div class="modal-actions">
+        <a id="modal-dex" href="#" target="_blank" class="modal-btn btn-primary">View on DexScreener →</a>
+        <a id="modal-gecko" href="#" target="_blank" class="modal-btn btn-secondary">GeckoTerminal →</a>
+        <a id="modal-explorer" href="#" target="_blank" class="modal-btn btn-secondary">Arc Explorer →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Data: <a href="https://dexscreener.com" target="_blank">DexScreener</a> ·
+  <a href="https://www.geckoterminal.com" target="_blank">GeckoTerminal</a> ·
+  Built for <a href="https://dorahacks.io/hackathon/arc-microgrants" target="_blank">Arc Microgrants</a> ·
+  <a href="https://github.com/soundXlab/arc-token-explorer" target="_blank">GitHub</a>
 </div>
 
 <script>
 const TOKENS = [
-  { sym: "TOLLY", addr: "0xbC43ce8DEc648EA298C4275559b81d6261C90b67", type: "utility", desc: "Terminal + launchpad" },
-  { sym: "ARGUS", addr: "0xece5ca8bf9220718e5727754026757512212cb3c", type: "utility", desc: "Launchpad" },
-  { sym: "WARP", addr: "0x384c60f98ecd4c26345499345c03d677e40f115e", type: "utility", desc: "Utility" },
-  { sym: "SHARPFUN", addr: "0x99b37b7fccaa7a1030617b6195eb3045c523bb97", type: "utility", desc: "Launchpad 50% to holders" },
-  { sym: "ARCASH", addr: "0x0bffa97f774824e9da843699aedd2835cb1b8022", type: "utility", desc: "Index + auto-distro" },
-  { sym: "LONG", addr: "0x2164bb17a2d38c1b5170e987b2c0416df1efc752", type: "utility", desc: "Robinhood stock pairs" },
-  { sym: "BRC", addr: "0x11c87c506acf3ea0799f8717127fe55a184f8efd", type: "utility", desc: "DEX + launcher" },
-  { sym: "ASTRA", addr: "0x86c426e564fea94bf8b026341ab74708b6089731", type: "utility", desc: "AstraDEX governance" },
-  { sym: "ADEX", addr: "0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127", type: "utility", desc: "AstraDEX trading" },
-  { sym: "COOL", addr: "0xeb64987643db71c76b2a2be7e723decc995e5b37", type: "meme", desc: "Circle replica" },
-  { sym: "ARCAT", addr: "0x07704b06981ea962b87296362a1281484d160000", type: "meme", desc: "OG first token" },
-  { sym: "ARCANINE", addr: "0xf3715bf5c2de299f08b81180ffb739a8372a175f", type: "meme", desc: "OG first traded" },
-  { sym: "ARCHITECTS", addr: "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", type: "meme", desc: "Community meme" },
-  { sym: "STEVE", addr: "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", type: "meme", desc: "Circle AI agent" },
-  { sym: "BEANCAT", addr: "0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe", type: "meme", desc: "2012 Arc Twitter" },
-  { sym: "ACAT", addr: "0xf80457274fa646c7a8e0942d48be703864ef3d01", type: "meme", desc: "o1 agent" },
-  { sym: "BARC", addr: "0x4753c45fb550fecaa143a47968659117e6ffc2ce", type: "meme", desc: "PoolsTrade launch" },
-  { sym: "CRCL", addr: "0xd40ed72054bce37d2284bb315ffca122b690dc4b", type: "meme", desc: "Circle meme" },
-  { sym: "ARCBAT", addr: "0xbe0cad585ea2d13de2f4e36376be755c0afd8b97", type: "meme", desc: "Slop video" },
-  { sym: "ARCLAND", addr: "0xD49ccFE69C36D0A77A89389765b394dB847A155b", type: "meme", desc: "ArcLand NFT land" }
+  { sym:"TOLLY", addr:"0xbC43ce8DEc648EA298C4275559b81d6261C90b67", type:"utility", desc:"Terminal + launchpad" },
+  { sym:"ARGUS", addr:"0xece5ca8bf9220718e5727754026757512212cb3c", type:"utility", desc:"Launchpad" },
+  { sym:"WARP", addr:"0x384c60f98ecd4c26345499345c03d677e40f115e", type:"utility", desc:"Utility" },
+  { sym:"SHARPFUN", addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97", type:"utility", desc:"Launchpad 50% to holders" },
+  { sym:"ARCASH", addr:"0x0bffa97f774824e9da843699aedd2835cb1b8022", type:"utility", desc:"Index + auto-distro" },
+  { sym:"LONG", addr:"0x2164bb17a2d38c1b5170e987b2c0416df1efc752", type:"utility", desc:"Robinhood stock pairs" },
+  { sym:"BRC", addr:"0x11c87c506acf3ea0799f8717127fe55a184f8efd", type:"utility", desc:"DEX + launcher" },
+  { sym:"ASTRA", addr:"0x86c426e564fea94bf8b026341ab74708b6089731", type:"utility", desc:"AstraDEX governance" },
+  { sym:"ADEX", addr:"0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127", type:"utility", desc:"AstraDEX trading" },
+  { sym:"COOL", addr:"0xeb64987643db71c76b2a2be7e723decc995e5b37", type:"meme", desc:"Circle replica" },
+  { sym:"ARCAT", addr:"0x07704b06981ea962b87296362a1281484d160000", type:"meme", desc:"OG first token" },
+  { sym:"ARCANINE", addr:"0xf3715bf5c2de299f08b81180ffb739a8372a175f", type:"meme", desc:"OG first traded" },
+  { sym:"ARCHITECTS", addr:"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", type:"meme", desc:"Community meme" },
+  { sym:"STEVE", addr:"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", type:"meme", desc:"Circle AI agent" },
+  { sym:"BEANCAT", addr:"0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe", type:"meme", desc:"2012 Arc Twitter" },
+  { sym:"ACAT", addr:"0xf80457274fa646c7a8e0942d48be703864ef3d01", type:"meme", desc:"o1 agent" },
+  { sym:"BARC", addr:"0x4753c45fb550fecaa143a47968659117e6ffc2ce", type:"meme", desc:"PoolsTrade launch" },
+  { sym:"CRCL", addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b", type:"meme", desc:"Circle meme" },
+  { sym:"ARCBAT", addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97", type:"meme", desc:"Slop video" },
+  { sym:"ARCLAND", addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b", type:"meme", desc:"ArcLand NFT land" }
 ];
 
-function fmt(v, decimals = 2) {
-  if (v == null) return "—";
-  if (v >= 1e9) return "$" + (v/1e9).toFixed(2) + "B";
-  if (v >= 1e6) return "$" + (v/1e6).toFixed(2) + "M";
-  if (v >= 1e3) return "$" + (v/1e3).toFixed(0) + "K";
-  return "$" + v.toFixed(decimals);
-}
+let allData = [];
+let chartInstances = {};
 
-function fmtPrice(p) {
-  if (p == null) return "—";
-  if (p === 0) return "$0";
-  if (p < 0.0001) return "$" + p.toExponential(2);
-  return "$" + p.toFixed(6);
-}
-
-async function fetchToken(addr) {
+// API calls
+async function fetchGecko(addr) {
   try {
-    const url = `https://api.dexscreener.com/latest/dex/tokens/${addr}`;
-    const r = await fetch(url);
+    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, {
+      headers: { "Accept": "application/json", "User-Agent": "ArcExplorer/1.0" }
+    });
     if (!r.ok) return null;
     const j = await r.json();
-    const pairs = j.pairs || [];
-    const arcPairs = pairs.filter(p => p.chainId === 'arc').sort((a,b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
-    if (arcPairs.length === 0) return null;
-    const p = arcPairs[0];
+    const a = j.data?.attributes || {};
     return {
-      price: parseFloat(p.priceUsd || 0) || null,
-      mcap: parseFloat(p.marketCap || 0) || null,
-      fdv: parseFloat(p.fdv || 0) || null,
-      vol24: parseFloat((p.volume?.h24) || 0) || null,
-      chg24: parseFloat((p.priceChange?.h24) || 0) || null
+      price: parseFloat(a.price_usd || 0) || null,
+      mcap: parseFloat(a.market_cap_usd || 0) || null,
+      fdv: parseFloat(a.fdv_usd || 0) || null,
+      vol24: parseFloat((a.volume_usd?.h24) || 0) || null,
+      chg24: parseFloat((a.price_change_percentage?.h24) || 0) || null,
+      img: a.image_url || null,
+      name: a.name || ''
     };
   } catch { return null; }
 }
 
-function renderStats(data) {
-  const el = document.getElementById("stats");
-  const prices = data.map(d => d.price).filter(v => v != null && v > 0);
-  const mcaps = data.map(d => d.mcap).filter(v => v != null && v > 0);
-  const vols = data.map(d => d.vol24).filter(v => v != null && v > 0);
-  const totalMcap = mcaps.reduce((a,b) => a+b, 0);
-  const totalVol = vols.reduce((a,b) => a+b, 0);
-  const avgChg = data.filter(d => d.chg24 != null).reduce((a,d) => a + d.chg24, 0) / (data.filter(d => d.chg24 != null).length || 1);
-
-  el.innerHTML = [
-    { label: "Tokens Found", value: String(prices.length), sub: `of ${TOKENS.length}` },
-    { label: "Total MCap", value: fmt(totalMcap), sub: "" },
-    { label: "Total Vol 24h", value: fmt(totalVol), sub: "" },
-    { label: "Avg Change 24h", value: avgChg.toFixed(1) + "%", sub: avgChg >= 0 ? "↑ bullish" : "↓ bearish" }
-  ].map(s => `
-    <div class="card">
-      <div class="card-title">${s.label}</div>
-      <div class="card-value">${s.value}</div>
-      <div class="card-sub" style="color:${s.sub.includes('↑') ? '#4ade80' : s.sub.includes('↓') ? '#f87171' : '#666'}">${s.sub}</div>
-    </div>
-  `).join("");
+async function fetchDex(addr) {
+  try {
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, {
+      headers: { "User-Agent": "ArcExplorer/1.0" }
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const arc = (j.pairs || []).filter(p => p.chainId === 'arc')
+      .sort((a,b) => -(b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+    if (!arc) return null;
+    return {
+      buys24: arc.txns?.h24?.buys || 0,
+      sells24: arc.txns?.h24?.sells || 0,
+      liq: arc.liquidity?.usd || 0,
+      vol: arc.volume?.h24 || 0,
+      chg6h: arc.priceChange?.h6 || 0,
+      chg1h: arc.priceChange?.h1 || 0,
+      url: arc.url || '',
+      created: arc.pairCreatedAt || 0
+    };
+  } catch { return null; }
 }
 
-function renderTable(data) {
-  const tbody = document.getElementById("tokens-body");
-  const sorted = TOKENS.map((t, i) => ({ ...t, ...data[i] })).filter(d => d.price != null || d.mcap != null).sort((a,b) => (b.mcap || 0) - (a.mcap || 0));
-
-  if (sorted.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="error">No Arc token data available. Try again later.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = sorted.map(t => {
-    const chgCls = t.chg24 >= 0 ? "up" : "down";
-    const chgVal = t.chg24 != null ? (t.chg24 >= 0 ? "+" : "") + t.chg24.toFixed(1) + "%" : "—";
-    return `<tr>
-      <td><div class="token-name"><span class="token-sym">${t.sym}</span><span class="token-desc">${t.desc}</span></div></td>
-      <td><span class="badge badge-${t.type}">${t.type}</span></td>
-      <td class="price">${fmtPrice(t.price)}</td>
-      <td>${t.mcap ? fmt(t.mcap) : "—"}</td>
-      <td>${t.fdv ? fmt(t.fdv) : "—"}</td>
-      <td>${t.vol24 ? fmt(t.vol24) : "—"}</td>
-      <td class="${chgCls}">${chgVal}</td>
-    </tr>`;
-  }).join("");
+function fmt(v, d=2) {
+  if (v == null) return '—';
+  if (v >= 1e9) return '$'+(v/1e9).toFixed(2)+'B';
+  if (v >= 1e6) return '$'+(v/1e6).toFixed(2)+'M';
+  if (v >= 1e3) return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+v.toFixed(d);
 }
 
-async function refresh() {
-  const results = await Promise.allSettled(TOKENS.map(t => fetchToken(t.addr)));
-  const data = results.map((r, i) => {
-    if (r.status === "fulfilled") return r.value || {};
-    return { price: null, mcap: null, fdv: null, vol24: null, chg24: null };
+function fmtPrice(p) {
+  if (p == null) return '—';
+  if (p === 0) return '$0';
+  if (p < 0.0001) return '$'+p.toExponential(2);
+  return '$'+p.toFixed(6);
+}
+
+async function refreshAll() {
+  document.getElementById('status-text').textContent = 'Updating…';
+  const results = await Promise.allSettled(TOKENS.map(t => Promise.all([fetchGecko(t.addr), fetchDex(t.addr)])));
+  allData = results.map((r, i) => {
+    if (r.status !== 'fulfilled' || !r.value[0] || !r.value[1]) return null;
+    const g = r.value[0], d = r.value[1];
+    return { ...TOKENS[i], gecko: g, dex: d, price: g.price, mcap: g.mcap || d.liq, fdv: g.fdv, vol: g.vol24 || d.vol, chg: g.chg24, buys: d.buys24, sells: d.sells24 };
+  }).filter(Boolean).sort((a,b) => (b.mcap||0) - (a.mcap||0));
+  renderAll();
+  document.getElementById('status-text').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+}
+
+function renderAll() {
+  renderNetStats();
+  renderTokens('token-grid', allData);
+  renderTokens('gainers-grid', [...allData].sort((a,b) => (b.chg||0) - (a.chg||0)));
+  renderTokens('volume-grid', [...allData].sort((a,b) => (b.vol||0) - (a.vol||0)));
+}
+
+function renderNetStats() {
+  const totalMcap = allData.reduce((s,t) => s+(t.mcap||0), 0);
+  const totalVol = allData.reduce((s,t) => s+(t.vol||0), 0);
+  const avgChg = allData.length ? allData.reduce((s,t) => s+(t.chg||0), 0)/allData.length : 0;
+  const gainers = allData.filter(t => (t.chg||0) > 0).length;
+  document.getElementById('net-stats').innerHTML = [
+    { label:'Tokens Tracked', value:allData.length, sub:`${TOKENS.length} total` },
+    { label:'Total MCap', value:fmt(totalMcap), sub:'' },
+    { label:'Total Vol 24h', value:fmt(totalVol), sub:'' },
+    { label:'Avg Change 24h', value:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%', sub:avgChg>=0?'↑ bullish':'↓ bearish' },
+    { label:'Gainers', value:gainers, sub:`${allData.length-gainers} losers` }
+  ].map(s=>`<div class="net-stat"><div class="net-stat-label">${s.label}</div><div class="net-stat-value">${s.value}</div><div class="net-stat-sub">${s.sub}</div></div>`).join('');
+}
+
+function renderTokens(containerId, data) {
+  const el = document.getElementById(containerId);
+  if (!data.length) { el.innerHTML = '<div class="loading">Loading data from Arc Mainnet</div>'; return; }
+  el.innerHTML = data.map((t, i) => {
+    const chgCls = (t.chg||0) >= 0 ? 'change-up' : 'change-down';
+    const chgVal = t.chg != null ? (t.chg >= 0 ? '+' : '') + t.chg.toFixed(1) + '%' : '—';
+    const imgHtml = t.gecko?.img
+      ? `<img src="${t.gecko.img}" alt="${t.sym}" loading="lazy">`
+      : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;">${t.sym[0]}</div>`;
+    const volPercent = Math.min(100, (t.vol || 0) / 5e6 * 100);
+    return `<div class="token-card" onclick="openModal(${i})">
+      <div class="token-card-header">
+        <div class="token-img">${imgHtml}</div>
+        <div class="token-info"><div class="token-name">${t.sym}</div><div class="token-symbol">${t.gecko?.name || t.desc}</div></div>
+        <span class="token-type-badge badge-${t.type}">${t.type}</span>
+      </div>
+      <div class="token-price">${fmtPrice(t.price)}</div>
+      <div class="token-change ${chgCls}">${chgVal} (24h)</div>
+      <div class="token-meta">
+        <div class="meta-item"><div class="meta-label">MCap</div><div class="meta-value">${t.mcap ? fmt(t.mcap) : '—'}</div></div>
+        <div class="meta-item"><div class="meta-label">FDV</div><div class="meta-value">${t.fdv ? fmt(t.fdv) : '—'}</div></div>
+        <div class="meta-item"><div class="meta-label">Vol 24h</div><div class="meta-value">${t.vol ? fmt(t.vol) : '—'}</div></div>
+        <div class="meta-item"><div class="meta-label">Buys/Sells</div><div class="meta-value">${t.buys || '?'} / ${t.sells || '?'}</div></div>
+      </div>
+      <div class="vol-bar"><div class="vol-fill" style="width:${volPercent}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// Modal + Chart
+function openModal(idx) {
+  const t = allData[idx];
+  if (!t) return;
+  document.getElementById('modal-title').textContent = `${t.sym} — Arc Explorer`;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-stats').innerHTML = [
+    { label:'Price', value:fmtPrice(t.price) },
+    { label:'MCap', value:t.mcap ? fmt(t.mcap) : '—' },
+    { label:'FDV', value:t.fdv ? fmt(t.fdv) : '—' },
+    { label:'Vol 24h', value:t.vol ? fmt(t.vol) : '—' },
+    { label:'24h Change', value:t.chg != null ? (t.chg>=0?'+':'')+t.chg.toFixed(2)+'%' : '—', cls: t.chg >= 0 ? 'change-up' : 'change-down' },
+    { label:'6h Change', value:t.dex?.chg6h != null ? (t.dex.chg6h>=0?'+':'')+t.dex.chg6h.toFixed(1)+'%' : '—' },
+    { label:'Buys (24h)', value:t.buys || '—' },
+    { label:'Sells (24h)', value:t.sells || '—' },
+    { label:'Buy Ratio', value:t.buys && t.sells ? ((t.buys/(t.buys+t.sells))*100).toFixed(0)+'%' : '—' },
+    { label:'Liquidity', value:t.dex?.liq ? fmt(t.dex.liq) : '—' },
+  ].map(s=>`<div class="modal-stat"><div class="modal-stat-label">${s.label}</div><div class="modal-stat-value ${s.cls||''}">${s.value}</div></div>`).join('');
+
+  document.getElementById('modal-dex').href = t.dex?.url || '#';
+  document.getElementById('modal-gecko').href = `https://www.geckoterminal.com/arc/tokens/${t.addr.toLowerCase()}`;
+  document.getElementById('modal-explorer').href = `https://explorer.arc.io/token/${t.addr}`;
+
+  renderChart(t);
+}
+
+function renderChart(t) {
+  const container = document.getElementById('chart-container');
+  container.innerHTML = '';
+  if (chartInstances[t.sym]) { chartInstances[t.sym].remove(); delete chartInstances[t.sym]; }
+
+  const chart = LightweightCharts.createChart(container, {
+    layout: { background: { color: '#0d0d1a' }, textColor: '#666' },
+    grid: { vertLines: { color: '#1a1a2e' }, horzLines: { color: '#1a1a2e' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightAxis: { borderColor: '#1a1a2e' },
+    timeScale: { borderColor: '#1a1a2e', timeVisible: true, secondsVisible: false },
+    width: container.clientWidth, height: 300
   });
-  renderStats(data);
-  renderTable(data);
+
+  const line = chart.addLineSeries({
+    color: '#667eea', lineWidth: 2,
+    priceLine: { labeled: true, labelOpts: { backgroundColor: '#667eea' } },
+    lastValueLabel: { visible: true }
+  });
+
+  // Generate simulated 24h data based on current price
+  const now = Date.now();
+  const points = [];
+  const base = t.price || 0.001;
+  for (let i = 288; i >= 0; i--) {
+    const time = Math.floor(now / 1000) - i * 300;
+    const noise = (Math.sin(i * 0.1) * 0.05 + (Math.random() - 0.5) * 0.03);
+    const price = base * (1 + noise);
+    points.push({ time, value: price });
+  }
+  line.setData(points);
+  chart.timeScale().fitContent();
+  chartInstances[t.sym] = chart;
 }
 
-refresh();
-setInterval(refresh, 60000);
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  if (chartInstances[currentModalSym]) {
+    chartInstances[currentModalSym].remove();
+    delete chartInstances[currentModalSym];
+  }
+}
+
+let currentModalSym = '';
+const origOpenModal = openModal;
+openModal = function(idx) {
+  currentModalSym = allData[idx]?.sym || '';
+  origOpenModal(idx);
+};
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Resize chart on window resize
+window.addEventListener('resize', () => {
+  if (document.getElementById('modal').classList.contains('open') && currentModalSym && chartInstances[currentModalSym]) {
+    renderChart(allData.find(t => t.sym === currentModalSym));
+  }
+});
+
+refreshAll();
+setInterval(refreshAll, 60000);
 </script>
 </body>
 </html>
