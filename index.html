@@ -366,7 +366,7 @@ async function refreshAll() {
   const addrs = results.map(r=>r.addr.toLowerCase());
   const llama = await fetchLlamaPrices(addrs);
 
-  allData = results.filter(r=>r.dex||r.gecko).map(r => {
+  allData = results.filter(r=>r.dex||r.gecko && r.addr).map(r => {
     const price = llama[r.addr.toLowerCase()] || r.gecko?.price || r.dex?.price;
     return {...r, price, mcap:r.gecko?.mcap||r.dex?.mcap, fdv:r.gecko?.fdv||r.dex?.fdv, vol:r.gecko?.vol24||r.dex?.vol, chg:r.gecko?.chg24??r.dex?.chg24, chg7d:r.gecko?.chg7d};
   }).sort((a,b)=>(b.mcap||0)-(a.mcap||0));
