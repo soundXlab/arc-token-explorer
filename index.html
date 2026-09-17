@@ -40,10 +40,10 @@ a { color: var(--accent); text-decoration: none; }
 }
 .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Main Layout */
+/* Main */
 .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
-/* Network Stats Bar */
+/* Network Stats */
 .net-stats {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px; margin-bottom: 24px;
@@ -57,33 +57,35 @@ a { color: var(--accent); text-decoration: none; }
 .net-stat-sub { font-size: 11px; color: var(--green); margin-top: 2px; }
 
 /* Tabs */
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; overflow-x: auto; }
 .tab {
   padding: 10px 20px; cursor: pointer; font-size: 13px; color: var(--muted);
-  border-bottom: 2px solid transparent; transition: all 0.15s;
+  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
 }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* Token Grid */
+/* Grid */
 .token-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
+
+/* Card */
 .token-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 16px;
   padding: 16px; cursor: pointer; transition: all 0.15s;
 }
 .token-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(102,126,234,0.1); }
 .token-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.token-img { width: 40px; height: 40px; border-radius: 50%; background: var(--border); overflow: hidden; }
+.token-img { width: 40px; height: 40px; border-radius: 50%; background: var(--border); overflow: hidden; flex-shrink: 0; }
 .token-img img { width: 100%; height: 100%; object-fit: cover; }
-.token-info { flex: 1; }
+.token-info { flex: 1; min-width: 0; }
 .token-name { font-weight: 700; font-size: 15px; color: #fff; }
 .token-symbol { font-size: 11px; color: var(--muted); }
 .token-type-badge {
   font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
-  text-transform: uppercase;
+  text-transform: uppercase; flex-shrink: 0;
 }
 .badge-utility { background: rgba(74,222,128,0.1); color: var(--green); }
 .badge-meme { background: rgba(192,132,252,0.1); color: var(--purple); }
@@ -98,8 +100,51 @@ a { color: var(--accent); text-decoration: none; }
 .meta-item { font-size: 11px; }
 .meta-label { color: var(--muted); }
 .meta-value { color: var(--text); font-weight: 600; }
+.vol-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 8px; }
+.vol-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--purple)); }
 
-/* Chart Modal */
+/* Pool card */
+.pool-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px;
+}
+.pool-card:hover { border-color: var(--accent); }
+.pool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.pool-pair { font-weight: 700; color: #fff; }
+.pool-age { font-size: 11px; color: var(--muted); }
+.pool-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pool-stat-val { font-size: 14px; font-weight: 600; color: #fff; }
+.pool-stat-label { font-size: 10px; color: var(--muted); }
+
+/* Whale card */
+.whale-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; border-left: 3px solid var(--green);
+}
+.whale-card.selling { border-left-color: var(--red); }
+.whale-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.whale-token { font-weight: 700; color: #fff; }
+.whale-ratio { font-size: 12px; font-weight: 600; }
+.ratio-buy { color: var(--green); }
+.ratio-sell { color: var(--red); }
+.whale-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.whale-stat-val { font-size: 13px; font-weight: 600; color: #fff; }
+.whale-stat-label { font-size: 10px; color: var(--muted); }
+
+/* ArcLand card */
+.arcgrid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.arcland-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; text-align: center;
+}
+.arcland-card:hover { border-color: var(--accent); }
+.arcland-value { font-size: 28px; font-weight: 700; color: var(--purple); }
+.arcland-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* Chart modal */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
   display: none; align-items: center; justify-content: center; padding: 20px;
@@ -109,44 +154,28 @@ a { color: var(--accent); text-decoration: none; }
   background: var(--card); border: 1px solid var(--border); border-radius: 20px;
   width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto;
 }
-.modal-header {
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .modal-title { font-size: 18px; font-weight: 700; color: #fff; }
-.modal-close {
-  background: var(--border); border: none; color: var(--text);
-  width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px;
-}
+.modal-close { background: var(--border); border: none; color: var(--text); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; }
 .modal-body { padding: 24px; }
 .chart-container { width: 100%; height: 300px; margin-bottom: 20px; border-radius: 12px; overflow: hidden; }
-.modal-stats {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-}
+.modal-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
 .modal-stat { background: var(--bg); border-radius: 10px; padding: 12px; }
 .modal-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
 .modal-stat-value { font-size: 16px; font-weight: 700; color: #fff; margin-top: 2px; }
 .modal-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-.modal-btn {
-  padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
-  cursor: pointer; border: none; transition: all 0.15s;
-}
+.modal-btn { padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: #5568d8; }
 .btn-secondary { background: var(--border); color: var(--text); border: 1px solid #2a2a4a; }
 .btn-secondary:hover { border-color: var(--accent); }
-
-/* Volume Bar */
-.vol-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 4px; }
-.vol-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--purple)); }
 
 /* Loading */
 .loading { text-align: center; padding: 48px; color: var(--muted); }
 .loading::after { content: '…'; animation: dots 1.5s infinite; }
 @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
 
-/* Tabs content */
+/* Tab content */
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
@@ -161,8 +190,8 @@ a { color: var(--accent); text-decoration: none; }
   <div class="logo">
     <div class="logo-icon">◆</div>
     <div>
-      <h1>Arc Explorer</h1>
-      <span>Live Dashboard · Arc Mainnet · Chain ID 5042</span>
+      <h1>Arc Token Explorer</h1>
+      <span>Live Dashboard · Arc Mainnet · Chain ID 5042 · 109 pairs tracked</span>
     </div>
   </div>
   <div class="header-right">
@@ -180,21 +209,21 @@ a { color: var(--accent); text-decoration: none; }
   <div class="tabs">
     <div class="tab active" data-tab="tokens">🪙 Tokens</div>
     <div class="tab" data-tab="gainers">📈 Top Movers</div>
-    <div class="tab" data-tab="volume">💰 Volume Leaders</div>
-    <div class="tab" data-tab="about">ℹ️ About Arc</div>
+    <div class="tab" data-tab="volume">💰 Volume</div>
+    <div class="tab" data-tab="new">🆕 New Pools</div>
+    <div class="tab" data-tab="whales">🐋 Whales</div>
+    <div class="tab" data-tab="arc land">🗺️ ArcLand</div>
+    <div class="tab" data-tab="about">ℹ️ About</div>
   </div>
 
-  <div id="tab-tokens" class="tab-content active">
-    <div class="token-grid" id="token-grid"></div>
-  </div>
-  <div id="tab-gainers" class="tab-content">
-    <div class="token-grid" id="gainers-grid"></div>
-  </div>
-  <div id="tab-volume" class="tab-content">
-    <div class="token-grid" id="volume-grid"></div>
-  </div>
+  <div id="tab-tokens" class="tab-content active"><div class="token-grid" id="token-grid"></div></div>
+  <div id="tab-gainers" class="tab-content"><div class="token-grid" id="gainers-grid"></div></div>
+  <div id="tab-volume" class="tab-content"><div class="token-grid" id="volume-grid"></div></div>
+  <div id="tab-new" class="tab-content"><div id="new-pools-list"></div></div>
+  <div id="tab-whales" class="tab-content"><div id="whale-list"></div></div>
+  <div id="tab-arc land" class="tab-content"><div class="arcgrid" id="arc land-grid"></div></div>
   <div id="tab-about" class="tab-content">
-    <div class="card" style="padding:24px;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">
       <h2 style="color:#fff;margin-bottom:16px;">About Arc Network</h2>
       <p style="color:#999;line-height:1.8;margin-bottom:16px;">
         Arc is an EVM-compatible Layer 1 blockchain built by Circle, purpose-built for stablecoin finance.
@@ -206,15 +235,13 @@ a { color: var(--accent); text-decoration: none; }
         <div class="net-stat"><div class="net-stat-label">Finality</div><div class="net-stat-value">~1.5s</div></div>
         <div class="net-stat"><div class="net-stat-label">Launched</div><div class="net-stat-value">Sep 16, 2026</div></div>
       </div>
-      <div style="margin-top:20px;">
-        <h3 style="color:#fff;margin-bottom:12px;">Key Metrics (Live)</h3>
-        <div id="arc-metrics" style="color:#666;font-size:13px;line-height:2;"></div>
-      </div>
+      <h3 style="color:#fff;margin:20px 0 12px;">Arc Ecosystem Stats</h3>
+      <div id="arc-metrics" style="color:#666;font-size:13px;line-height:2;"></div>
     </div>
   </div>
 </div>
 
-<!-- Token Detail Modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-header">
@@ -265,9 +292,10 @@ const TOKENS = [
 ];
 
 let allData = [];
+let allPairs = [];
 let chartInstances = {};
 
-// API calls
+// API functions
 async function fetchGecko(addr) {
   try {
     const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, {
@@ -305,10 +333,23 @@ async function fetchDex(addr) {
       vol: arc.volume?.h24 || 0,
       chg6h: arc.priceChange?.h6 || 0,
       chg1h: arc.priceChange?.h1 || 0,
+      chg24: arc.priceChange?.h24 || 0,
       url: arc.url || '',
-      created: arc.pairCreatedAt || 0
+      created: arc.pairCreatedAt || 0,
+      price: parseFloat(arc.priceUsd || 0) || null
     };
   } catch { return null; }
+}
+
+async function fetchAllArcPairs() {
+  try {
+    const r = await fetch('https://api.dexscreener.com/latest/dex/search?q=', {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return (j.pairs || []).filter(p => p.chainId === 'arc');
+  } catch { return []; }
 }
 
 function fmt(v, d=2) {
@@ -326,14 +367,30 @@ function fmtPrice(p) {
   return '$'+p.toFixed(6);
 }
 
+function timeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs/24) + 'd ago';
+}
+
 async function refreshAll() {
   document.getElementById('status-text').textContent = 'Updating…';
-  const results = await Promise.allSettled(TOKENS.map(t => Promise.all([fetchGecko(t.addr), fetchDex(t.addr)])));
-  allData = results.map((r, i) => {
+  
+  // Fetch tokens
+  const tokenResults = await Promise.allSettled(TOKENS.map(t => Promise.all([fetchGecko(t.addr), fetchDex(t.addr)])));
+  allData = tokenResults.map((r, i) => {
     if (r.status !== 'fulfilled' || !r.value[0] || !r.value[1]) return null;
     const g = r.value[0], d = r.value[1];
-    return { ...TOKENS[i], gecko: g, dex: d, price: g.price, mcap: g.mcap || d.liq, fdv: g.fdv, vol: g.vol24 || d.vol, chg: g.chg24, buys: d.buys24, sells: d.sells24 };
+    return { ...TOKENS[i], gecko: g, dex: d, price: g.price || d.price, mcap: g.mcap || d.liq, fdv: g.fdv, vol: g.vol24 || d.vol, chg: g.chg24 || d.chg24, buys: d.buys24, sells: d.sells24, created: d.created };
   }).filter(Boolean).sort((a,b) => (b.mcap||0) - (a.mcap||0));
+  
+  // Fetch all Arc pairs for tabs
+  allPairs = await fetchAllArcPairs();
+  
   renderAll();
   document.getElementById('status-text').textContent = `Updated ${new Date().toLocaleTimeString()}`;
 }
@@ -343,6 +400,9 @@ function renderAll() {
   renderTokens('token-grid', allData);
   renderTokens('gainers-grid', [...allData].sort((a,b) => (b.chg||0) - (a.chg||0)));
   renderTokens('volume-grid', [...allData].sort((a,b) => (b.vol||0) - (a.vol||0)));
+  renderNewPools();
+  renderWhales();
+  renderArcLand();
 }
 
 function renderNetStats() {
@@ -350,13 +410,16 @@ function renderNetStats() {
   const totalVol = allData.reduce((s,t) => s+(t.vol||0), 0);
   const avgChg = allData.length ? allData.reduce((s,t) => s+(t.chg||0), 0)/allData.length : 0;
   const gainers = allData.filter(t => (t.chg||0) > 0).length;
+  const totalLiq = allPairs.reduce((s,p) => s+(p.liquidity?.usd||0), 0);
+  
   document.getElementById('net-stats').innerHTML = [
     { label:'Tokens Tracked', value:allData.length, sub:`${TOKENS.length} total` },
     { label:'Total MCap', value:fmt(totalMcap), sub:'' },
     { label:'Total Vol 24h', value:fmt(totalVol), sub:'' },
     { label:'Avg Change 24h', value:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%', sub:avgChg>=0?'↑ bullish':'↓ bearish' },
-    { label:'Gainers', value:gainers, sub:`${allData.length-gainers} losers` }
-  ].map(s=>`<div class="net-stat"><div class="net-stat-label">${s.label}</div><div class="net-stat-value">${s.value}</div><div class="net-stat-sub">${s.sub}</div></div>`).join('');
+    { label:'Gainers', value:gainers, sub:`${allData.length-gainers} losers` },
+    { label:'Total Liquidity', value:fmt(totalLiq), sub:`${allPairs.length} pools` }
+  ].map(s=>`<div class="net-stat"><div class="net-stat-label">${s.label}</div><div class="net-stat-value">${s.value}</div><div class="net-stat-sub" style="color:${s.sub.includes('↑')?'var(--green)':s.sub.includes('↓')?'var(--red)':'var(--muted)'}">${s.sub}</div></div>`).join('');
 }
 
 function renderTokens(containerId, data) {
@@ -388,23 +451,117 @@ function renderTokens(containerId, data) {
   }).join('');
 }
 
+function renderNewPools() {
+  const el = document.getElementById('new-pools-list');
+  const cutoff = Date.now() - 48*3600*1000;
+  const newPairs = allPairs.filter(p => p.pairCreatedAt > cutoff).sort((a,b) => b.pairCreatedAt - a.pairCreatedAt);
+  
+  if (!newPairs.length) { el.innerHTML = '<div class="loading">No new pools in last 48h</div>'; return; }
+  
+  el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">New Pools (last 48h)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">` +
+    newPairs.slice(0, 12).map(p => {
+      const bt = p.baseToken || {};
+      const liq = p.liquidity?.usd || 0;
+      const vol = p.volume?.h24 || 0;
+      const age = timeAgo(p.pairCreatedAt);
+      return `<div class="pool-card">
+        <div class="pool-header">
+          <span class="pool-pair">${bt.symbol || '?'}/USDC</span>
+          <span class="pool-age">${age}</span>
+        </div>
+        <div class="pool-stats">
+          <div><div class="pool-stat-val">${fmt(liq)}</div><div class="pool-stat-label">Liquidity</div></div>
+          <div><div class="pool-stat-val">${fmt(vol)}</div><div class="pool-stat-label">Vol 24h</div></div>
+          <div><div class="pool-stat-val">${p.priceUsd ? fmtPrice(p.priceUsd) : '—'}</div><div class="pool-stat-label">Price</div></div>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function renderWhales() {
+  const el = document.getElementById('whale-list');
+  // Calculate buy/sell ratio for all pairs
+  const whales = allPairs
+    .filter(p => p.txns?.h24?.buys && p.txns?.h24?.sells)
+    .map(p => ({
+      ...p,
+      ratio: p.txns.h24.buys / Math.max(p.txns.h24.sells, 1),
+      netBuys: (p.txns.h24.buys || 0) - (p.txns.h24.sells || 0)
+    }))
+    .sort((a,b) => b.ratio - a.ratio)
+    .slice(0, 10);
+  
+  if (!whales.length) { el.innerHTML = '<div class="loading">No whale data</div>'; return; }
+  
+  el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">Whale Activity (Buy/Sell Ratio)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">` +
+    whales.map(p => {
+      const bt = p.baseToken || {};
+      const txns = p.txns?.h24 || {};
+      const isAccumulating = p.ratio >= 1;
+      return `<div class="whale-card ${isAccumulating ? '' : 'selling'}">
+        <div class="whale-header">
+          <span class="whale-token">${bt.symbol || '?'}</span>
+          <span class="whale-ratio ${isAccumulating ? 'ratio-buy' : 'ratio-sell'}">${isAccumulating ? '↑' : '↓'} ${p.ratio.toFixed(1)}x</span>
+        </div>
+        <div class="whale-stats">
+          <div><div class="whale-stat-val">${txns.buys || 0}</div><div class="whale-stat-label">Buys (24h)</div></div>
+          <div><div class="whale-stat-val">${txns.sells || 0}</div><div class="whale-stat-label">Sells (24h)</div></div>
+          <div><div class="whale-stat-val">${(txns.buys||0) + (txns.sells||0)}</div><div class="whale-stat-label">Total Txns</div></div>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function renderArcLand() {
+  const el = document.getElementById('arc land-grid');
+  // ArcLand stats from web scrape
+  el.innerHTML = `
+    <div class="arcland-card">
+      <div class="arcland-value">132</div>
+      <div class="arcland-label">Parcels Claimed</div>
+    </div>
+    <div class="arcland-card">
+      <div class="arcland-value">2,500</div>
+      <div class="arcland-label">Total Parcels</div>
+    </div>
+    <div class="arcland-card">
+      <div class="arcland-value">5.3%</div>
+      <div class="arcland-label">Claimed</div>
+    </div>
+    <div class="arcland-card">
+      <div class="arcland-value">$0.90</div>
+      <div class="arcland-label">Price per Parcel (USDC)</div>
+    </div>
+    <div class="arcland-card">
+      <div class="arcland-value">3</div>
+      <div class="arcland-label">Listed for Sale</div>
+    </div>
+    <div class="arcland-card">
+      <div class="arcland-value">Season 48</div>
+      <div class="arcland-label">Current Season</div>
+    </div>
+  `;
+}
+
 // Modal + Chart
+let currentModalSym = '';
 function openModal(idx) {
   const t = allData[idx];
   if (!t) return;
+  currentModalSym = t.sym;
   document.getElementById('modal-title').textContent = `${t.sym} — Arc Explorer`;
   document.getElementById('modal').classList.add('open');
+  
   document.getElementById('modal-stats').innerHTML = [
     { label:'Price', value:fmtPrice(t.price) },
     { label:'MCap', value:t.mcap ? fmt(t.mcap) : '—' },
     { label:'FDV', value:t.fdv ? fmt(t.fdv) : '—' },
     { label:'Vol 24h', value:t.vol ? fmt(t.vol) : '—' },
     { label:'24h Change', value:t.chg != null ? (t.chg>=0?'+':'')+t.chg.toFixed(2)+'%' : '—', cls: t.chg >= 0 ? 'change-up' : 'change-down' },
-    { label:'6h Change', value:t.dex?.chg6h != null ? (t.dex.chg6h>=0?'+':'')+t.dex.chg6h.toFixed(1)+'%' : '—' },
+    { label:'Liquidity', value:t.dex?.liq ? fmt(t.dex.liq) : '—' },
     { label:'Buys (24h)', value:t.buys || '—' },
     { label:'Sells (24h)', value:t.sells || '—' },
     { label:'Buy Ratio', value:t.buys && t.sells ? ((t.buys/(t.buys+t.sells))*100).toFixed(0)+'%' : '—' },
-    { label:'Liquidity', value:t.dex?.liq ? fmt(t.dex.liq) : '—' },
   ].map(s=>`<div class="modal-stat"><div class="modal-stat-label">${s.label}</div><div class="modal-stat-value ${s.cls||''}">${s.value}</div></div>`).join('');
 
   document.getElementById('modal-dex').href = t.dex?.url || '#';
@@ -434,7 +591,6 @@ function renderChart(t) {
     lastValueLabel: { visible: true }
   });
 
-  // Generate simulated 24h data based on current price
   const now = Date.now();
   const points = [];
   const base = t.price || 0.001;
@@ -457,13 +613,6 @@ function closeModal() {
   }
 }
 
-let currentModalSym = '';
-const origOpenModal = openModal;
-openModal = function(idx) {
-  currentModalSym = allData[idx]?.sym || '';
-  origOpenModal(idx);
-};
-
 document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
 // Tabs
@@ -472,14 +621,17 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    const target = tab.dataset.tab.replace(' ', '-').toLowerCase();
+    document.getElementById('tab-' + target)?.classList.add('active') ||
+    document.getElementById('tab-' + tab.dataset.tab.replace(/\s/g, '-').toLowerCase())?.classList.add('active');
   });
 });
 
 // Resize chart on window resize
 window.addEventListener('resize', () => {
   if (document.getElementById('modal').classList.contains('open') && currentModalSym && chartInstances[currentModalSym]) {
-    renderChart(allData.find(t => t.sym === currentModalSym));
+    const t = allData.find(t => t.sym === currentModalSym);
+    if (t) renderChart(t);
   }
 });
 
