@@ -645,12 +645,6 @@ async function renderRealChart(t) {
   chart.timeScale().fitContent();
   charts[t.addr] = chart;
 }
-    line.setData(pts);
-  }
-
-  chart.timeScale().fitContent();
-  charts[t.addr] = chart;
-}
 
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
