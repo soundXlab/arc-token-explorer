@@ -340,10 +340,10 @@ async function fetchLlamaHistory(address, points=48) {
   return series;
 }
 
-// Load local cached history
+// Load local cached history via API
 async function fetchLocalHistory(address) {
   try {
-    const r = await fetch(`${BASE}/api/chart/${address}?points=720`);
+    const r = await fetch(`${BASE}/api/chart/${address}?points=1440`);
     if (r.ok) {
       const d = await r.json();
       return d.points || [];
@@ -603,43 +603,39 @@ async function renderRealChart(t) {
     lastValueLabel: { visible: false },
   });
 
-  // Try Llama first, fall back to local cache
-  let history = await fetchLlamaHistory(t.addr, 24);
+  // Primary: fetch local accumulated history (most reliable)
+  let history = await fetchLocalHistory(t.addr);
 
   if (history.length < 3) {
-    // Fallback to local cached history
-    const local = await fetchLocalHistory(t.addr);
-    if (local.length >= 3) {
-      history = local.map(p => ({ time: p.t, value: p.p }));
-    }
+    // Try Llama live fetch as fallback
+    const llama = await fetchLlamaHistory(t.addr, 24);
+    if (llama.length >= 3) history = llama;
   }
 
-  if (history.length > 0) {
+  if (history.length >= 3) {
     line.setData(history);
-
-    // Generate volume bars from price changes
+    // Volume bars from price changes
     const volData = [];
     for (let i = 1; i < history.length; i++) {
       const chg = history[i].value - history[i-1].value;
       volData.push({
         time: history[i].time,
-        value: Math.abs(chg) * 1000000,
+        value: Math.max(0.001, Math.abs(chg) * 1000000),
         color: chg >= 0 ? volBorder : volColor.replace('0.15', '0.3').replace('0.4', '0.6'),
       });
     }
     if (volData.length) volSeries.setData(volData);
+    // Show point count
+    const ptsEl = document.createElement('div');
+    ptsEl.style.cssText = 'position:absolute;top:8px;left:8px;font-size:10px;color:#555;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;z-index:10';
+    ptsEl.textContent = history.length + ' points';
+    box.appendChild(ptsEl);
   } else {
-    // Last resort: generate from current price with trend
-    const now = Date.now()/1000;
-    const trend = (t.chg || 0) > 0 ? 0.0002 : -0.0002;
-    const pts = [];
-    for (let i=48; i>=0; i--) {
-      const time = Math.floor(now)-i*1800;
-      const noise = Math.sin(i*0.3)*0.008 + (Math.random()-0.5)*0.005;
-      const val = price * (1 + noise + trend*i*0.0002);
-      pts.push({ time, value: Math.max(val, price*0.5) });
-    }
-    line.setData(pts);
+    // No real data yet — show message, not fake chart
+    const msg = document.createElement('div');
+    msg.style.cssText = 'display:flex;align-items:center;justify-content:center;height:260px;color:#555;font-size:13px;text-align:center;flex-direction:column;gap:8px';
+    msg.innerHTML = '<div style="font-size:24px">⏳</div><div>Accumulating price history...</div><div style="font-size:11px">Will show real data once we have 3+ readings</div>';
+    box.appendChild(msg);
   }
 
   chart.timeScale().fitContent();
