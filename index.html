@@ -6,179 +6,163 @@
 <title>Arc Token Explorer — Live Dashboard</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #050510; --card: rgba(13,13,26,0.85); --border: rgba(26,26,46,0.8);
-  --text: #e8e8f0; --muted: #666; --accent: #667eea; --accent2: #764ba2;
-  --green: #4ade80; --red: #f87171; --purple: #c084fc; --gold: #fbbf24;
-}
-body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-a { color: var(--accent); text-decoration: none; }
-.header {
-  background: linear-gradient(135deg, rgba(13,13,26,0.95) 0%, rgba(26,10,46,0.95) 100%);
-  border-bottom: 1px solid var(--border); padding: 16px 24px;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50;
-}
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon {
-  width: 40px; height: 40px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex; align-items: center; justify-content: center; font-size: 20px;
-  box-shadow: 0 0 20px rgba(102,126,234,0.4);
-}
-.logo h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-.logo span { font-size: 11px; color: var(--muted); }
-.header-right { display: flex; align-items: center; gap: 16px; }
-.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; box-shadow: 0 0 10px var(--green); }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.2)} }
-.status-text { font-size: 12px; color: var(--muted); }
-.btn {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer;
-  font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 4px 15px rgba(102,126,234,0.3);
-}
-.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050510;--card:rgba(13,13,26,0.85);--border:rgba(26,26,46,0.8);--text:#e8e8f0;--muted:#666;--accent:#667eea;--accent2:#764ba2;--green:#4ade80;--red:#f87171;--purple:#c084fc;--gold:#fbbf24;--orange:#fb923c}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
 
-.main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+/* Header */
+.header{background:linear-gradient(135deg,rgba(13,13,26,0.95),rgba(26,10,46,0.95));border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;backdrop-filter:blur(20px);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 18px rgba(102,126,234,0.4)}
+.logo h1{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.logo span{font-size:10px;color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:12px}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;box-shadow:0 0 8px var(--green)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.status{font-size:11px;color:var(--muted)}
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;box-shadow:0 3px 12px rgba(102,126,234,0.3)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(102,126,234,0.4)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:linear-gradient(135deg,#dc2626,#991b1b)}
+
+/* Alert banner */
+.alert-banner{background:linear-gradient(90deg,rgba(248,113,113,0.15),rgba(251,146,60,0.15));border-bottom:1px solid rgba(248,113,113,0.3);padding:10px 20px;display:none;align-items:center;gap:12px;overflow:hidden}
+.alert-banner.show{display:flex}
+.alert-dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:pulse 1s infinite;flex-shrink:0}
+.alert-text{font-size:13px;color:#fecaca;white-space:nowrap;animation:scroll-left 15s linear infinite}
+@keyframes scroll-left{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+/* Main layout */
+.main{max-width:1400px;margin:0 auto;padding:16px}
 
 /* Stats */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px; margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-  padding: 16px; backdrop-filter: blur(10px); transition: all 0.2s;
-}
-.stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
-.stat-value { font-size: 22px; font-weight: 800; color: #fff; }
-.stat-sub { font-size: 11px; margin-top: 4px; }
-.up { color: var(--green); } .down { color: var(--red); }
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;backdrop-filter:blur(10px);transition:all .2s}
+.stat:hover{border-color:var(--accent);transform:translateY(-1px)}
+.stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px}
+.stat-v{font-size:18px;font-weight:800;color:#fff}
+.stat-sub{font-size:10px;margin-top:2px}
+.up{color:var(--green)}.down{color:var(--red)}
 
 /* Tabs */
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; overflow-x: auto; }
-.tab {
-  padding: 12px 20px; cursor: pointer; font-size: 13px; color: var(--muted);
-  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
-  font-weight: 500;
-}
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tabs{display:flex;gap:3px;margin-bottom:16px;border-bottom:1px solid var(--border);overflow-x:auto;padding-bottom:0}
+.tab{padding:10px 16px;cursor:pointer;font-size:12px;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;font-weight:500;position:relative}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-badge{position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.flex-col{display:flex;flex-direction:column;gap:12px}
 
-/* Token card */
-.card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-  padding: 16px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
-  position: relative; overflow: hidden;
-}
-.card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  opacity: 0; transition: opacity 0.2s;
-}
-.card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(102,126,234,0.15); }
-.card:hover::before { opacity: 1; }
-.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.card-img {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; color: #fff; font-size: 16px; flex-shrink: 0;
-}
-.card-info { flex: 1; min-width: 0; }
-.card-name { font-weight: 800; font-size: 16px; color: #fff; }
-.card-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.card-new {
-  font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
-  background: rgba(74,222,128,0.2); color: var(--green); flex-shrink: 0;
-}
-.card-price { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 4px; }
-.card-chg { font-size: 14px; font-weight: 700; }
-.card-meta {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
-  padding-top: 12px; border-top: 1px solid var(--border);
-}
-.meta { font-size: 11px; }
-.meta-l { color: var(--muted); }
-.meta-v { color: var(--text); font-weight: 600; }
+/* Card */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 30px rgba(102,126,234,0.15)}
+.card:hover::before{opacity:1}
+.card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.card-img{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:14px;flex-shrink:0}
+.card-info{flex:1;min-width:0}
+.card-name{font-weight:800;font-size:15px;color:#fff}
+.card-desc{font-size:10px;color:var(--muted);margin-top:1px}
+.badge-new{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;background:rgba(74,222,128,0.2);color:var(--green)}
+.badge-known{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;background:rgba(102,126,234,0.2);color:var(--accent)}
+.card-price{font-size:22px;font-weight:800;color:#fff}
+.card-chg{font-size:13px;font-weight:700}
+.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.meta{font-size:10px}.meta-l{color:var(--muted)}.meta-v{color:var(--text);font-weight:600}
 
-/* Whale / Pool cards */
-.whale-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px; border-left: 3px solid var(--green);
-}
-.whale-card.sell { border-left-color: var(--red); }
-.whale-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.whale-name { font-weight: 700; color: #fff; }
-.whale-ratio { font-weight: 700; }
-.ratio-buy { color: var(--green); } .ratio-sell { color: var(--red); }
-.whale-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.whale-stat-v { font-size: 14px; font-weight: 700; color: #fff; }
-.whale-stat-l { font-size: 10px; color: var(--muted); }
+/* Alert card */
+.alert-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;border-left:3px solid var(--accent);animation:fadeIn .3s}
+.alert-card.new_token{border-left-color:var(--green)}
+.alert-card.price_crash{border-left-color:var(--red)}
+.alert-card.price_pump{border-left-color:var(--orange)}
+.alert-card.whale_buy{border-left-color:var(--green)}
+.alert-card.whale_sell{border-left-color:var(--red)}
+.alert-card.test{border-left-color:var(--purple)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.alert-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.alert-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:4px}
+.at-new_token{background:rgba(74,222,128,0.2);color:var(--green)}
+.at-price_crash{background:rgba(248,113,113,0.2);color:var(--red)}
+.at-price_pump{background:rgba(251,146,60,0.2);color:var(--orange)}
+.at-whale_buy{background:rgba(74,222,128,0.2);color:var(--green)}
+.at-whale_sell{background:rgba(248,113,113,0.2);color:var(--red)}
+.at-test{background:rgba(192,132,252,0.2);color:var(--purple)}
+.alert-time{font-size:10px;color:var(--muted)}
+.alert-msg{font-size:13px;color:var(--text);line-height:1.4}
 
-.pool-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px;
-}
-.pool-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
-.pool-pair { font-weight: 700; color: #fff; }
-.pool-age { font-size: 11px; color: var(--muted); }
-.pool-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.pool-v { font-size: 13px; font-weight: 700; color: #fff; }
-.pool-l { font-size: 10px; color: var(--muted); }
+/* New token feed */
+.new-feed{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.new-feed h3{color:#fff;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.new-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.new-item:last-child{border-bottom:none}
+.new-sym{font-weight:700;color:#fff;min-width:80px}
+.new-price{font-size:13px;color:var(--text)}
+.new-mcap{font-size:11px;color:var(--muted);margin-left:auto}
 
-/* ArcLand */
-.arcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-.arc-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px; text-align: center;
-}
-.arc-card:hover { border-color: var(--purple); }
-.arc-v { font-size: 28px; font-weight: 800; color: var(--purple); }
-.arc-l { font-size: 11px; color: var(--muted); margin-top: 4px; }
+/* Settings panel */
+.settings-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.settings-panel h3{color:#fff;font-size:14px;margin-bottom:14px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px}
+.setting-row:last-child{border-bottom:none}
+.setting-label{font-size:12px;color:var(--text)}
+.setting-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.setting-input{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:80px;text-align:center;outline:none}
+.setting-input:focus{border-color:var(--accent)}
+.toggle{position:relative;width:40px;height:22px;background:var(--border);border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(18px)}
 
 /* Chart modal */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
-  display: none; align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(5px);
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: linear-gradient(180deg, #0d0d1a 0%, #0a0a15 100%);
-  border: 1px solid var(--border); border-radius: 20px;
-  width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;
-}
-.modal-hdr { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.modal-title { font-size: 20px; font-weight: 800; color: #fff; }
-.modal-close { background: var(--border); border: none; color: var(--text); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 18px; }
-.modal-body { padding: 24px; }
-.chart-box { width: 100%; height: 280px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
-.modal-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
-.mstat { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; }
-.mstat-l { font-size: 10px; color: var(--muted); text-transform: uppercase; }
-.mstat-v { font-size: 16px; font-weight: 700; color: #fff; margin-top: 4px; }
-.modal-links { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-.mbtn { padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
-.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
-.btn-secondary { background: var(--border); color: var(--text); border: 1px solid #2a2a4a; }
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(5px)}
+.modal-overlay.open{display:flex}
+.modal{background:linear-gradient(180deg,#0d0d1a,#0a0a15);border:1px solid var(--border);border-radius:18px;width:100%;max-width:760px;max-height:90vh;overflow-y:auto}
+.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:18px;font-weight:800;color:#fff}
+.modal-close{background:var(--border);border:none;color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px}
+.modal-body{padding:20px}
+.chart-box{width:100%;height:260px;border-radius:10px;overflow:hidden;margin-bottom:16px}
+.modal-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px}
+.mstat{background:rgba(0,0,0,0.3);border-radius:8px;padding:10px}
+.mstat-l{font-size:9px;color:var(--muted);text-transform:uppercase}
+.mstat-v{font-size:15px;font-weight:700;color:#fff;margin-top:3px}
+.modal-links{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.mbtn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-secondary{background:var(--border);color:var(--text);border:1px solid #2a2a4a}
 
-.loading { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+/* Search */
+.search-bar{display:flex;gap:8px;margin-bottom:14px}
+.search-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--muted)}
 
-.footer { margin-top: 40px; padding: 20px; text-align: center; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
-.search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
-.search-input {
-  flex: 1; background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 16px; color: var(--text); font-size: 14px; outline: none;
+/* Loading */
+.loading{text-align:center;padding:36px;color:var(--muted);font-size:13px}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.footer{margin-top:32px;padding:16px;text-align:center;color:var(--muted);font-size:10px;border-top:1px solid var(--border)}
+.footer a{color:var(--accent)}
+
+/* Mobile */
+@media(max-width:640px){
+  .header{padding:10px 14px}
+  .logo h1{font-size:16px}
+  .main{padding:12px}
+  .stats{grid-template-columns:repeat(3,1fr);gap:6px}
+  .stat{padding:10px 8px}
+  .stat-v{font-size:15px}
+  .grid{grid-template-columns:1fr}
+  .tabs{gap:0}
+  .tab{padding:8px 12px;font-size:11px}
+  .modal{max-height:95vh;border-radius:14px}
+  .chart-box{height:200px}
 }
-.search-input:focus { border-color: var(--accent); }
-.search-input::placeholder { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -186,22 +170,22 @@ a { color: var(--accent); text-decoration: none; }
 <div class="header">
   <div class="logo">
     <div class="logo-icon">◆</div>
-    <div>
-      <h1>Arc Token Explorer</h1>
-      <span>Live Dashboard · Arc Mainnet · Chain ID 5042</span>
-    </div>
+    <div><h1>Arc Token Explorer</h1><span>Auto-Discovery · Real Charts · Live Alerts</span></div>
   </div>
   <div class="header-right">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div class="pulse-dot"></div>
-      <span class="status-text" id="status-text">Connecting…</span>
-    </div>
-    <button class="btn" onclick="refreshAll()">↻ Refresh</button>
+    <div style="display:flex;align-items:center;gap:6px"><div class="pulse"></div><span class="status" id="status">Connecting…</span></div>
+    <button class="btn btn-sm" onclick="manualScan()">↻ Scan</button>
   </div>
 </div>
 
+<!-- Alert banner -->
+<div class="alert-banner" id="alert-banner">
+  <div class="alert-dot"></div>
+  <div class="alert-text" id="alert-text"></div>
+</div>
+
 <div class="main">
-  <div class="stats-grid" id="stats"></div>
+  <div class="stats" id="stats"></div>
   <div class="search-bar">
     <input type="text" class="search-input" id="search" placeholder="Search tokens…" oninput="filterTokens(this.value)">
   </div>
@@ -209,43 +193,22 @@ a { color: var(--accent); text-decoration: none; }
     <div class="tab active" data-tab="tokens">🪙 Tokens</div>
     <div class="tab" data-tab="gainers">📈 Movers</div>
     <div class="tab" data-tab="volume">💰 Volume</div>
-    <div class="tab" data-tab="new">🆕 New Pools</div>
-    <div class="tab" data-tab="whales">🐋 Whales</div>
-    <div class="tab" data-tab="arcland">🗺️ ArcLand</div>
-    <div class="tab" data-tab="about">ℹ️ About</div>
+    <div class="tab" data-tab="new">🆕 New</div>
+    <div class="tab" data-tab="alerts">🔔 Alerts<span class="tab-badge" id="alert-badge" style="display:none">0</span></div>
+    <div class="tab" data-tab="settings">⚙️ Settings</div>
   </div>
 
   <div id="tab-tokens" class="tab-content active"><div class="grid" id="token-grid"></div></div>
   <div id="tab-gainers" class="tab-content"><div class="grid" id="gainers-grid"></div></div>
   <div id="tab-volume" class="tab-content"><div class="grid" id="volume-grid"></div></div>
-  <div id="tab-new" class="tab-content"><div id="new-list"></div></div>
-  <div id="tab-whales" class="tab-content"><div id="whale-list"></div></div>
-  <div id="tab-arcland" class="tab-content"><div class="arcgrid" id="arcgrid"></div></div>
-  <div id="tab-about" class="tab-content">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;">
-      <h2 style="color:#fff;margin-bottom:16px;">About Arc Network</h2>
-      <p style="color:#999;line-height:1.8;margin-bottom:16px;">
-        Arc is an EVM-compatible Layer 1 blockchain built by Circle, purpose-built for stablecoin finance.
-        It uses USDC as the native gas token and offers sub-second deterministic finality.
-      </p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-        <div class="stat-card"><div class="stat-label">Chain ID</div><div class="stat-value">5042</div></div>
-        <div class="stat-card"><div class="stat-label">Native Gas</div><div class="stat-value">USDC</div></div>
-        <div class="stat-card"><div class="stat-label">Finality</div><div class="stat-value">~1.5s</div></div>
-        <div class="stat-card"><div class="stat-label">Launched</div><div class="stat-value">Sep 16</div></div>
-        <div class="stat-card"><div class="stat-label">Tokens Tracked</div><div class="stat-value" id="tracked-tokens">—</div></div>
-        <div class="stat-card"><div class="stat-label">Discovered</div><div class="stat-value" id="discovered-count">—</div></div>
-      </div>
-      <h3 style="color:#fff;margin:20px 0 12px;">Why This Dashboard Matters</h3>
-      <p style="color:#888;line-height:1.8;">
-        Arc Mainnet launched September 16, 2026 with 20+ tokens but no simple way to see what's happening.
-        This dashboard auto-discovers new tokens by scanning DexScreener pairs and expanding through
-        related token relationships. Built as a proof-of-concept that
-        <strong style="color:#fff">read-only tools with zero friction are the best onboarding path</strong>
-        for new chains. No wallet. No signup. Just data.
-      </p>
+  <div id="tab-new" class="tab-content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="new-feed" id="new-feed"></div>
+      <div class="new-feed"><h3>📊 Discovery Stats</h3><div id="discovery-stats"></div></div>
     </div>
   </div>
+  <div id="tab-alerts" class="tab-content"><div id="alert-list"></div></div>
+  <div id="tab-settings" class="tab-content"><div class="settings-panel" id="settings-panel"></div></div>
 </div>
 
 <!-- Modal -->
@@ -271,363 +234,326 @@ a { color: var(--accent); text-decoration: none; }
   Data: <a href="https://dexscreener.com" target="_blank">DexScreener</a> ·
   <a href="https://coins.llama.fi" target="_blank">Llama Prices</a> ·
   <a href="https://www.geckoterminal.com" target="_blank">GeckoTerminal</a> ·
-  Built for <a href="https://dorahacks.io/hackathon/arc-microgrants" target="_blank">Arc Microgrants</a> ·
+  Auto-discovery every 3min ·
   <a href="https://github.com/soundXlab/arc-token-explorer" target="_blank">GitHub</a>
 </div>
 
 <script>
-const KNOWN_TOKENS = [
-  { sym:"TOLLY", addr:"0xbC43ce8DEc648EA298C4275559b81d6261C90b67", desc:"Terminal + launchpad" },
-  { sym:"ARGUS", addr:"0xece5ca8bf9220718e5727754026757512212cb3c", desc:"Launchpad" },
-  { sym:"WARP", addr:"0x384c60f98ecd4c26345499345c03d677e40f115e", desc:"Utility" },
-  { sym:"SHARPFUN", addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97", desc:"Launchpad 50% to holders" },
-  { sym:"ARCASH", addr:"0x0bffa97f774824e9da843699aedd2835cb1b8022", desc:"Index + auto-distro" },
-  { sym:"LONG", addr:"0x2164bb17a2d38c1b5170e987b2c0416df1efc752", desc:"Robinhood stock pairs" },
-  { sym:"BRC", addr:"0x11c87c506acf3ea0799f8717127fe55a184f8efd", desc:"DEX + launcher" },
-  { sym:"ASTRA", addr:"0x86c426e564fea94bf8b026341ab74708b6089731", desc:"AstraDEX governance" },
-  { sym:"ADEX", addr:"0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127", desc:"AstraDEX trading" },
-  { sym:"COOL", addr:"0xeb64987643db71c76b2a2be7e723decc995e5b37", desc:"Circle replica" },
-  { sym:"ARCAT", addr:"0x07704b06981ea962b87296362a1281484d160000", desc:"OG first token" },
-  { sym:"ARCANINE", addr:"0xf3715bf5c2de299f08b81180ffb739a8372a175f", desc:"OG first traded" },
-  { sym:"ARCHITECTS", addr:"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", desc:"Community meme" },
-  { sym:"STEVE", addr:"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", desc:"Circle AI agent" },
-  { sym:"BEANCAT", addr:"0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe", desc:"2012 Arc Twitter" },
-  { sym:"ACAT", addr:"0xf80457274fa646c7a8e0942d48be703864ef3d01", desc:"o1 agent" },
-  { sym:"BARC", addr:"0x4753c45fb550fecaa143a47968659117e6ffc2ce", desc:"PoolsTrade launch" },
-  { sym:"CRCL", addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b", desc:"Circle meme" },
-  { sym:"ARCBAT", addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97", desc:"Slop video" },
-  { sym:"ARCLAND", addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b", desc:"ArcLand NFT land" },
-];
-const KNOWN_ADDRS = new Set(KNOWN_TOKENS.map(t => t.addr.toLowerCase()));
-
+// ── State ──
 let allData = [];
-let allPairs = [];
-let charts = {};
 let filteredData = [];
-let discoveryLastRun = null;
-let discoveredCount = 0;
+let charts = {};
+let alertCount = 0;
+let newAlerts = [];
+let discoveryInfo = {};
+const BASE = window.location.origin;
+const KNOWN_ADDRS = new Set([
+  "0xbc43ce8dec648ea298c4275559b81d6261c90b67","0xece5ca8bf9220718e5727754026757512212cb3c",
+  "0x384c60f98ecd4c26345499345c03d677e40f115e","0x99b37b7fccaa7a1030617b6195eb3045c523bb97",
+  "0x0bffa97f774824e9da843699aedd2835cb1b8022","0x2164bb17a2d38c1b5170e987b2c0416df1efc752",
+  "0x11c87c506acf3ea0799f8717127fe55a184f8efd","0x86c426e564fea94bf8b026341ab74708b6089731",
+  "0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127","0xd49ccfe69c36d0a77a89389765b394db847a155b",
+  "0xeb64987643db71c76b2a2be7e723decc995e5b37","0x07704b06981ea962b87296362a1281484d160000",
+  "0xf3715bf5c2de299f08b81180ffb739a8372a175f","0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0",
+  "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73","0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe",
+  "0xf80457274fa646c7a8e0942d48be703864ef3d01","0x4753c45fb550fecaa143a47968659117e6ffc2ce",
+  "0xd40ed72054bce37d2284bb315ffca122b690dc4b","0xbe0cad585ea2d13de2f4e36376be755c0afd8b97",
+]);
 
-const LLAMA_BASE = "https://coins.llama.fi/prices";
-const HEADERS = { "User-Agent": "ArcExplorer/1.0", "Accept": "application/json" };
+const TOKEN_DEFS = [
+  {sym:"TOLLY",addr:"0xbC43ce8DEc648EA298C4275559b81d6261C90b67",desc:"Terminal + launchpad"},
+  {sym:"ARGUS",addr:"0xece5ca8bf9220718e5727754026757512212cb3c",desc:"Launchpad"},
+  {sym:"WARP",addr:"0x384c60f98ecd4c26345499345c03d677e40f115e",desc:"Utility"},
+  {sym:"SHARPFUN",addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97",desc:"Launchpad 50% to holders"},
+  {sym:"ARCASH",addr:"0x0bffa97f774824e9da843699aedd2835cb1b8022",desc:"Index + auto-distro"},
+  {sym:"LONG",addr:"0x2164bb17a2d38c1b5170e987b2c0416df1efc752",desc:"Robinhood stock pairs"},
+  {sym:"BRC",addr:"0x11c87c506acf3ea0799f8717127fe55a184f8efd",desc:"DEX + launcher"},
+  {sym:"ASTRA",addr:"0x86c426e564fea94bf8b026341ab74708b6089731",desc:"AstraDEX governance"},
+  {sym:"ADEX",addr:"0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127",desc:"AstraDEX trading"},
+  {sym:"COOL",addr:"0xeb64987643db71c76b2a2be7e723decc995e5b37",desc:"Circle replica"},
+  {sym:"ARCAT",addr:"0x07704b06981ea962b87296362a1281484d160000",desc:"OG first token"},
+  {sym:"ARCANINE",addr:"0xf3715bf5c2de299f08b81180ffb739a8372a175f",desc:"OG first traded"},
+  {sym:"ARCHITECTS",addr:"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0",desc:"Community meme"},
+  {sym:"STEVE",addr:"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73",desc:"Circle AI agent"},
+  {sym:"BEANCAT",addr:"0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe",desc:"2012 Arc Twitter"},
+  {sym:"ACAT",addr:"0xf80457274fa646c7a8e0942d48be703864ef3d01",desc:"o1 agent"},
+  {sym:"BARC",addr:"0x4753c45fb550fecaa143a47968659117e6ffc2ce",desc:"PoolsTrade launch"},
+  {sym:"CRCL",addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b",desc:"Circle meme"},
+  {sym:"ARCBAT",addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97",desc:"Slop video"},
+  {sym:"ARCLAND",addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b",desc:"ArcLand NFT land"},
+];
 
-async function fetchJSON(url) {
-  try {
-    const r = await fetch(url, { headers: HEADERS });
-    if (!r.ok) return null;
-    return await r.json();
-  } catch { return null; }
+// ── API ──
+async function api(path, opts={}) {
+  const r = await fetch(BASE + path, {headers:{"User-Agent":"ArcExplorer/1.0"},...opts});
+  return r.json();
 }
 
 async function fetchGecko(addr) {
   try {
-    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, { headers: HEADERS });
+    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, {headers:{"User-Agent":"ArcExplorer/1.0"}});
     if (!r.ok) return null;
     const j = await r.json();
     const a = j.data?.attributes || {};
-    return {
-      price: parseFloat(a.price_usd || 0) || null,
-      mcap: parseFloat(a.market_cap_usd || 0) || null,
-      fdv: parseFloat(a.fdv_usd || 0) || null,
-      vol24: parseFloat((a.volume_usd?.h24) || 0) || null,
-      chg24: parseFloat((a.price_change_percentage?.h24) || 0) || null,
-      chg7d: parseFloat((a.price_change_percentage?.d7) || 0) || null,
-      img: a.image_url || null,
-      name: a.name || '',
-    };
+    return {price:parseFloat(a.price_usd||0)||null, mcap:parseFloat(a.market_cap_usd||0)||null, fdv:parseFloat(a.fdv_usd||0)||null, vol24:parseFloat(a.volume_usd?.h24||0)||null, chg24:parseFloat(a.price_change_percentage?.h24||0)||null, chg7d:parseFloat(a.price_change_percentage?.d7||0)||null, name:a.name||''};
   } catch { return null; }
 }
 
 async function fetchDex(addr) {
   try {
-    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, { headers: { "User-Agent": "Mozilla/5.0" } });
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, {headers:{"User-Agent":"Mozilla/5.0"}});
     if (!r.ok) return null;
     const j = await r.json();
-    const arc = (j.pairs || []).filter(p => p.chainId === 'arc')
-      .sort((a,b) => -(b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+    const arc = (j.pairs||[]).filter(p=>p.chainId==='arc').sort((a,b)=>-(b.liquidity?.usd||0)-(a.liquidity?.usd||0))[0];
     if (!arc) return null;
-    return {
-      buys24: arc.txns?.h24?.buys || 0,
-      sells24: arc.txns?.h24?.sells || 0,
-      liq: arc.liquidity?.usd || 0,
-      vol: arc.volume?.h24 || 0,
-      chg6h: arc.priceChange?.h6 || 0,
-      chg1h: arc.priceChange?.h1 || 0,
-      chg24: arc.priceChange?.h24 || 0,
-      url: arc.url || '',
-      created: arc.pairCreatedAt || 0,
-      price: parseFloat(arc.priceUsd || 0) || null,
-      mcap: parseFloat(arc.marketCap || 0) || null,
-      fdv: parseFloat(arc.fdv || 0) || null,
-    };
+    return {buys24:arc.txns?.h24?.buys||0, sells24:arc.txns?.h24?.sells||0, liq:arc.liquidity?.usd||0, vol:arc.volume?.h24||0, chg24:arc.priceChange?.h24||0, chg6h:arc.priceChange?.h6||0, chg1h:arc.priceChange?.h1||0, url:arc.url||'', created:arc.pairCreatedAt||0, price:parseFloat(arc.priceUsd||0)||null, mcap:parseFloat(arc.marketCap||0)||null, fdv:parseFloat(arc.fdv||0)||null};
   } catch { return null; }
 }
 
-async function fetchAllArcPairs() {
-  try {
-    const tokens = [...new Set(KNOWN_TOKENS.map(t => t.addr))];
-    const results = await Promise.allSettled(tokens.map(addr =>
-      fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, { headers: { "User-Agent": "Mozilla/5.0" } })
-        .then(r => r.json()).catch(() => null)
-    ));
-    const pairs = [];
-    for (const r of results) {
-      if (r.status === 'fulfilled' && r.value?.pairs) {
-        for (const p of r.value.pairs) {
-          if (p.chainId === 'arc') pairs.push(p);
-        }
-      }
-    }
-    return pairs;
-  } catch { return []; }
-}
-
 async function fetchLlamaPrices(addresses) {
-  const ids = addresses.map(a => `arc:${a}`).join(',');
-  const data = await fetchJSON(`${LLAMA_BASE}/current/${ids}`);
-  const result = {};
-  if (data?.coins) {
-    for (const [k, v] of Object.entries(data.coins)) {
-      const addr = k.split(':')[1]?.toLowerCase() || '';
-      result[addr] = v.price;
-    }
-  }
-  return result;
+  const ids = addresses.map(a=>`arc:${a}`).join(',');
+  try {
+    const r = await fetch(`https://coins.llama.fi/prices/current/${ids}`, {headers:{"User-Agent":"ArcExplorer/1.0"}});
+    if (!r.ok) return {};
+    const d = await r.json();
+    const result = {};
+    for (const [k,v] of Object.entries(d.coins||{})) result[k.split(':')[1]?.toLowerCase()||''] = v.price;
+    return result;
+  } catch { return {}; }
 }
 
-async function fetchLlamaHistory(address, points = 24) {
-  const now = Math.floor(Date.now() / 1000);
-  const interval = Math.floor(24 * 3600 / points);
+async function fetchLlamaHistory(address, points=48) {
+  const now = Math.floor(Date.now()/1000);
+  const interval = Math.floor(24*3600/Math.min(points, 24));
   const series = [];
-  for (let i = points - 1; i >= 0; i--) {
-    const ts = now - i * interval;
-    const data = await fetchJSON(`${LLAMA_BASE}/historical/${ts}/arc:${address}`);
-    const price = data?.coins?.[`arc:${address}`]?.price;
-    if (price != null) {
-      series.push({ time: ts, value: price });
-    }
+  for (let i=points-1; i>=0; i--) {
+    const ts = now - i*interval;
+    try {
+      const r = await fetch(`https://coins.llama.fi/prices/historical/${ts}/arc:${address}`, {headers:{"User-Agent":"ArcExplorer/1.0"}});
+      if (r.ok) {
+        const d = await r.json();
+        const p = d.coins?.[`arc:${address}`]?.price;
+        if (p) series.push({time: ts, value: p});
+      }
+    } catch {}
   }
   return series;
 }
 
-function fmt(v, d=2) {
-  if (v == null) return '—';
-  if (v >= 1e9) return '$'+(v/1e9).toFixed(2)+'B';
-  if (v >= 1e6) return '$'+(v/1e6).toFixed(2)+'M';
-  if (v >= 1e3) return '$'+(v/1e3).toFixed(0)+'K';
-  return '$'+v.toFixed(d);
-}
-
-function fmtPrice(p) {
-  if (p == null) return '—';
-  if (p === 0) return '$0';
-  if (p < 0.0001) return '$'+p.toExponential(2);
-  return '$'+p.toFixed(6);
-}
-
-function timeAgo(ts) {
-  if (!ts) return '—';
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return mins + 'm ago';
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return hrs + 'h ago';
-  return Math.floor(hrs/24) + 'd ago';
-}
-
-async function refreshAll() {
-  document.getElementById('status-text').textContent = 'Updating…';
-
-  // Fetch token data in parallel
-  const tokenPromises = KNOWN_TOKENS.map(async (t, i) => {
-    const [g, d, llama] = await Promise.all([fetchGecko(t.addr), fetchDex(t.addr), null]);
-    const isKnown = KNOWN_ADDRS.has(t.addr.toLowerCase());
-    return { ...t, gecko: g, dex: d, isKnown, addr: t.addr.toLowerCase() };
-  });
-
-  const results = await Promise.all(tokenPromises);
-
-  // Batch llama prices
-  const addrs = results.map(r => r.addr);
-  const llamaPrices = await fetchLlamaPrices(addrs);
-  for (const r of results) {
-    if (llamaPrices[r.addr]) r.llamaPrice = llamaPrices[r.addr];
-  }
-
-  allData = results.filter(r => r.dex || r.gecko).map(r => {
-    const price = r.llamaPrice || r.gecko?.price || r.dex?.price;
-    const mcap = r.gecko?.mcap || r.dex?.mcap;
-    const fdv = r.gecko?.fdv || r.dex?.fdv;
-    const vol = r.gecko?.vol24 || r.dex?.vol;
-    const chg = r.gecko?.chg24 ?? r.dex?.chg24;
-    const chg7d = r.gecko?.chg7d;
-    return { ...r, price, mcap, fdv, vol, chg, chg7d };
-  }).sort((a,b) => (b.mcap||0) - (a.mcap||0));
-
-  filteredData = [...allData];
-
-  allPairs = await fetchAllArcPairs();
-
-  // Load discovery data
+// Load local cached history
+async function fetchLocalHistory(address) {
   try {
-    const disc = await fetchJSON('/api/discovery');
-    if (disc) {
-      const tokens = Array.isArray(disc) ? disc : disc.tokens || [];
-      discoveredCount = tokens.filter(t => t.type === 'discovered').length;
-      discoveryLastRun = tokens.length > 0 ? tokens[tokens.length-1]?.first_seen : null;
+    const r = await fetch(`${BASE}/api/chart/${address}?points=720`);
+    if (r.ok) {
+      const d = await r.json();
+      return d.points || [];
     }
   } catch {}
+  return [];
+}
 
+// ── Refresh ──
+async function refreshAll() {
+  document.getElementById('status').textContent = 'Updating…';
+
+  // Fetch token data
+  const results = await Promise.all(TOKEN_DEFS.map(async t => {
+    const [g, d] = await Promise.all([fetchGecko(t.addr), fetchDex(t.addr)]);
+    return {...t, gecko:g, dex:d, isKnown:KNOWN_ADDRS.has(t.addr.toLowerCase())};
+  }));
+
+  // Batch Llama prices
+  const addrs = results.map(r=>r.addr.toLowerCase());
+  const llama = await fetchLlamaPrices(addrs);
+
+  allData = results.filter(r=>r.dex||r.gecko).map(r => {
+    const price = llama[r.addr.toLowerCase()] || r.gecko?.price || r.dex?.price;
+    return {...r, price, mcap:r.gecko?.mcap||r.dex?.mcap, fdv:r.gecko?.fdv||r.dex?.fdv, vol:r.gecko?.vol24||r.dex?.vol, chg:r.gecko?.chg24??r.dex?.chg24, chg7d:r.gecko?.chg7d};
+  }).sort((a,b)=>(b.mcap||0)-(a.mcap||0));
+
+  filteredData = [...allData];
+  updateDiscovery();
   renderAll();
-  document.getElementById('status-text').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+  document.getElementById('status').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+}
+
+async function updateDiscovery() {
+  try {
+    const d = await api('/api/discovery');
+    discoveryInfo = d;
+  } catch {}
 }
 
 function renderAll() {
   renderStats();
   renderTokens('token-grid', filteredData);
-  renderTokens('gainers-grid', [...filteredData].sort((a,b) => (b.chg||0) - (a.chg||0)));
-  renderTokens('volume-grid', [...filteredData].sort((a,b) => (b.vol||0) - (a.vol||0)));
-  renderNewPools();
-  renderWhales();
-  renderArcLand();
-  document.getElementById('tracked-tokens').textContent = allData.length;
-  document.getElementById('discovered-count').textContent = discoveredCount;
+  renderTokens('gainers-grid', [...filteredData].sort((a,b)=>(b.chg||0)-(a.chg||0)));
+  renderTokens('volume-grid', [...filteredData].sort((a,b)=>(b.vol||0)-(a.vol||0)));
+  renderNewFeed();
+  renderAlerts();
+  renderSettings();
 }
 
 function renderStats() {
-  const totalMcap = allData.reduce((s,t) => s+(t.mcap||0), 0);
-  const totalVol = allData.reduce((s,t) => s+(t.vol||0), 0);
-  const avgChg = allData.length ? allData.reduce((s,t) => s+(t.chg||0), 0)/allData.length : 0;
-  const gainers = allData.filter(t => (t.chg||0) > 0).length;
-  const totalLiq = allPairs.reduce((s,p) => s+(p.liquidity?.usd||0), 0);
-  const totalBuys = allData.reduce((s,t) => s+(t.dex?.buys24||0), 0);
-  const totalSells = allData.reduce((s,t) => s+(t.dex?.sells24||0), 0);
+  const totalMcap = allData.reduce((s,t)=>s+(t.mcap||0),0);
+  const totalVol = allData.reduce((s,t)=>s+(t.vol||0),0);
+  const avgChg = allData.length ? allData.reduce((s,t)=>s+(t.chg||0),0)/allData.length : 0;
+  const gainers = allData.filter(t=>(t.chg||0)>0).length;
+  const discovered = discoveryInfo?.discovered || 0;
 
   document.getElementById('stats').innerHTML = [
-    { label:'Tokens Tracked', value:allData.length, sub:`${KNOWN_TOKENS.length} known`, cls:'' },
-    { label:'Total MCap', value:fmt(totalMcap), sub:'', cls:'' },
-    { label:'Total Vol 24h', value:fmt(totalVol), sub:'', cls:'' },
-    { label:'Avg Change', value:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%', sub:avgChg>=0?'↑ bullish':'↓ bearish', cls:avgChg>=0?'up':'down' },
-    { label:'Gainers', value:gainers, sub:`${allData.length-gainers} losers`, cls:'' },
-    { label:'Total Liquidity', value:fmt(totalLiq), sub:`${allPairs.length} pools`, cls:'' },
-    { label:'Buy/Sell Ratio', value:(totalSells>0?(totalBuys/totalSells).toFixed(2):'—'), sub:`${totalBuys}B / ${totalSells}S`, cls:totalBuys>=totalSells?'up':'down' },
-  ].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value ${s.cls}">${s.value}</div><div class="stat-sub ${s.cls}">${s.sub}</div></div>`).join('');
+    {l:'Tokens',v:allData.length,s:`${discovered} discovered`},
+    {l:'MCap',v:fmt(totalMcap)},
+    {l:'Vol 24h',v:fmt(totalVol)},
+    {l:'Avg Chg',v:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%',c:avgChg>=0?'up':'down',s:avgChg>=0?'↑ bullish':'↓ bearish'},
+    {l:'Gainers',v:gainers,s:`${allData.length-gainers} losers`},
+    {l:'Discovered',v:discovered,s:'auto-scanned'},
+  ].map(s=>`<div class="stat"><div class="stat-l">${s.l}</div><div class="stat-v ${s.c||''}">${s.v}</div><div class="stat-sub ${s.c||''}">${s.s||''}</div></div>`).join('');
 }
 
-function renderTokens(containerId, data) {
-  const el = document.getElementById(containerId);
-  if (!data.length) { el.innerHTML = '<div class="loading">No tokens found</div>'; return; }
-  el.innerHTML = data.map((t, i) => {
-    const chgCls = (t.chg||0) >= 0 ? 'chg-up' : 'chg-down';
-    const chgVal = t.chg != null ? (t.chg >= 0 ? '+' : '') + t.chg.toFixed(1) + '%' : '—';
-    const volPercent = Math.min(100, (t.vol || 0) / 5e6 * 100);
+function renderTokens(id, data) {
+  const el = document.getElementById(id);
+  if (!data.length) { el.innerHTML='<div class="loading">No tokens found</div>'; return; }
+  el.innerHTML = data.map((t,i) => {
+    const chgCls = (t.chg||0)>=0?'chg-up':'chg-down';
+    const chgVal = t.chg!=null?(t.chg>=0?'+':'')+t.chg.toFixed(1)+'%':'—';
     return `<div class="card" onclick="openModal(${i})">
-      <div class="card-header">
+      <div class="card-hdr">
         <div class="card-img">${t.sym[0]}</div>
         <div class="card-info"><div class="card-name">${t.sym}</div><div class="card-desc">${t.desc}</div></div>
-        ${t.isKnown ? '' : '<span class="card-new">NEW</span>'}
+        ${t.isKnown?'<span class="badge-known">KNOWN</span>':'<span class="badge-new">NEW</span>'}
       </div>
       <div class="card-price">${fmtPrice(t.price)}</div>
-      <div class="card-chg ${chgCls}">${chgVal} <span style="font-size:11px;color:var(--muted)">24h</span></div>
+      <div class="card-chg ${chgCls}">${chgVal} <span style="font-size:10px;color:var(--muted)">24h</span></div>
       <div class="card-meta">
-        <div class="meta"><div class="meta-l">MCap</div><div class="meta-v">${t.mcap ? fmt(t.mcap) : '—'}</div></div>
-        <div class="meta"><div class="meta-l">FDV</div><div class="meta-v">${t.fdv ? fmt(t.fdv) : '—'}</div></div>
-        <div class="meta"><div class="meta-l">Vol 24h</div><div class="meta-v">${t.vol ? fmt(t.vol) : '—'}</div></div>
-        <div class="meta"><div class="meta-l">Buys/Sells</div><div class="meta-v">${t.dex?.buys24 || '?'} / ${t.dex?.sells24 || '?'}</div></div>
+        <div class="meta"><div class="meta-l">MCap</div><div class="meta-v">${t.mcap?fmt(t.mcap):'—'}</div></div>
+        <div class="meta"><div class="meta-l">FDV</div><div class="meta-v">${t.fdv?fmt(t.fdv):'—'}</div></div>
+        <div class="meta"><div class="meta-l">Vol 24h</div><div class="meta-v">${t.vol?fmt(t.vol):'—'}</div></div>
+        <div class="meta"><div class="meta-l">Buys/Sells</div><div class="meta-v">${t.dex?.buys24||'?'} / ${t.dex?.sells24||'?'}</div></div>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderNewPools() {
-  const el = document.getElementById('new-list');
-  const cutoff = Date.now() - 48*3600*1000;
-  const newPairs = allPairs.filter(p => p.pairCreatedAt > cutoff).sort((a,b) => b.pairCreatedAt - a.pairCreatedAt);
+function renderNewFeed() {
+  const el = document.getElementById('new-feed');
+  const discovered = allData.filter(t=>!t.isKnown).sort((a,b)=>(b.mcap||0)-(a.mcap||0));
+  el.innerHTML = `<h3>🆕 Discovered Tokens (${discovered.length})</h3>` +
+    (discovered.length ? discovered.slice(0,8).map(t=>`<div class="new-item">
+      <span class="new-sym">${t.sym}</span>
+      <span class="new-price">${fmtPrice(t.price)}</span>
+      <span class="new-mcap">${t.mcap?fmt(t.mcap):'—'}</span>
+    </div>`).join('') : '<div class="loading">No new tokens yet</div>');
 
-  if (!newPairs.length) { el.innerHTML = '<div class="loading">No new pools in last 48h</div>'; return; }
+  const ds = document.getElementById('discovery-stats');
+  ds.innerHTML = `
+    <div class="stat" style="margin-bottom:8px"><div class="stat-l">Total Tracked</div><div class="stat-v">${discoveryInfo.total||allData.length}</div></div>
+    <div class="stat" style="margin-bottom:8px"><div class="stat-l">Discovered</div><div class="stat-v" style="color:var(--green)">${discoveryInfo.discovered||0}</div></div>
+    <div class="stat" style="margin-bottom:8px"><div class="stat-l">Known (curated)</div><div class="stat-v">${discoveryInfo.known||20}</div></div>
+    <div class="stat"><div class="stat-l">Last Scan</div><div class="stat-v" style="font-size:12px">${discoveryInfo.last_scan?new Date(discoveryInfo.last_scan).toLocaleTimeString():'—'}</div></div>
+  `;
+}
 
-  el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">🆕 New Pools (last 48h)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">` +
-    newPairs.slice(0, 12).map(p => {
-      const bt = p.baseToken || {};
-      const liq = p.liquidity?.usd || 0;
-      const vol = p.volume?.h24 || 0;
-      const chg = p.priceChange?.h24 || 0;
-      const age = timeAgo(p.pairCreatedAt);
-      const chgCls = chg >= 0 ? 'chg-up' : 'chg-down';
-      return `<div class="pool-card">
-        <div class="pool-top">
-          <span class="pool-pair">${bt.symbol || '?'}/USDC</span>
-          <span class="pool-age">${age}</span>
-        </div>
-        <div class="pool-stats">
-          <div><div class="pool-v">${fmt(liq)}</div><div class="pool-l">Liquidity</div></div>
-          <div><div class="pool-v">${fmt(vol)}</div><div class="pool-l">Vol 24h</div></div>
-          <div><div class="pool-v ${chgCls}">${chg >= 0 ? '+' : ''}${chg?.toFixed(1) || 0}%</div><div class="pool-l">24h Chg</div></div>
-        </div>
+function renderAlerts() {
+  const el = document.getElementById('alert-list');
+  if (!newAlerts.length && !window._savedAlerts?.length) {
+    el.innerHTML = '<div class="loading">No alerts yet. Alerts appear when price moves or new tokens are discovered.</div>';
+    return;
+  }
+  const all = [...(window._savedAlerts||[]), ...newAlerts];
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 style="color:#fff;font-size:14px">🔔 Alerts (${all.length})</h3>
+    <button class="btn btn-sm btn-danger" onclick="clearAlerts()">Clear</button>
+  </div>` + all.slice(0,30).map(a=>`<div class="alert-card ${a.type}" style="margin-bottom:8px">
+    <div class="alert-hdr">
+      <span class="alert-type at-${a.type}">${a.type.replace('_',' ')}</span>
+      <span class="alert-time">${a.ts?new Date(a.ts).toLocaleTimeString():''}</span>
+    </div>
+    <div class="alert-msg">${a.msg}</div>
+  </div>`).join('');
+}
+
+function clearAlerts() {
+  fetch(BASE+'/api/alerts/clear',{method:'POST'});
+  window._savedAlerts = [];
+  newAlerts = [];
+  renderAlerts();
+}
+
+function renderSettings() {
+  const el = document.getElementById('settings-panel');
+  if (window._settings) {
+    const s = window._settings;
+    el.innerHTML = `<h3>⚙️ Alert Settings</h3>
+      <div class="setting-row">
+        <div><div class="setting-label">Enable Alerts</div><div class="setting-desc">Turn on/off alert generation</div></div>
+        <div class="toggle ${s.enabled?'on':''}" onclick="toggleSetting('enabled',this)"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Price Drop Alert</div><div class="setting-desc">Alert when price drops more than this % in one scan</div></div>
+        <input type="number" class="setting-input" value="${s.price_drop_pct}" onchange="saveSetting('price_drop_pct',this.value)">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Price Pump Alert</div><div class="setting-desc">Alert when price rises more than this %</div></div>
+        <input type="number" class="setting-input" value="${s.price_rise_pct}" onchange="saveSetting('price_rise_pct',this.value)">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Whale Ratio Threshold</div><div class="setting-desc">Alert when buy/sell ratio exceeds this (both directions)</div></div>
+        <input type="number" class="setting-input" value="${s.whale_ratio_threshold}" step="0.5" onchange="saveSetting('whale_ratio_threshold',this.value)">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Min New Token MCap</div><div class="setting-desc">Only alert on tokens with mcap above this</div></div>
+        <input type="number" class="setting-input" value="${s.new_token_mcap_min}" onchange="saveSetting('new_token_mcap_min',this.value)">
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">Test Alert</div><div class="setting-desc">Send a test notification</div></div>
+        <button class="btn btn-sm" onclick="testAlert()">Send Test</button>
       </div>`;
-    }).join('') + '</div>';
+  } else {
+    el.innerHTML = '<div class="loading">Loading settings…</div>';
+  }
 }
 
-function renderWhales() {
-  const el = document.getElementById('whale-list');
-  const whales = allPairs
-    .filter(p => p.txns?.h24?.buys && p.txns?.h24?.sells)
-    .map(p => ({ ...p, ratio: p.txns.h24.buys / Math.max(p.txns.h24.sells, 1) }))
-    .sort((a,b) => b.ratio - a.ratio).slice(0, 10);
-
-  if (!whales.length) { el.innerHTML = '<div class="loading">No whale data</div>'; return; }
-
-  el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">🐋 Whale Activity (Buy/Sell Ratio)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">` +
-    whales.map(p => {
-      const bt = p.baseToken || {};
-      const txns = p.txns?.h24 || {};
-      const accumulating = p.ratio >= 1;
-      return `<div class="whale-card ${accumulating ? '' : 'sell'}">
-        <div class="whale-top">
-          <span class="whale-name">${bt.symbol || '?'}</span>
-          <span class="whale-ratio ${accumulating ? 'ratio-buy' : 'ratio-sell'}">${accumulating ? '↑' : '↓'} ${p.ratio.toFixed(1)}x</span>
-        </div>
-        <div class="whale-stats">
-          <div><div class="whale-stat-v">${txns.buys || 0}</div><div class="whale-stat-l">Buys (24h)</div></div>
-          <div><div class="whale-stat-v">${txns.sells || 0}</div><div class="whale-stat-l">Sells (24h)</div></div>
-          <div><div class="whale-stat-v">${fmt(p.liquidity?.usd || 0)}</div><div class="whale-stat-l">Liquidity</div></div>
-        </div>
-      </div>`;
-    }).join('') + '</div>';
+async function saveSetting(key, val) {
+  await api('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({[key]:parseFloat(val)})});
+  window._settings[key] = parseFloat(val);
 }
 
-function renderArcLand() {
-  const el = document.getElementById('arcgrid');
-  el.innerHTML = [
-    { v: '132', l: 'Parcels Claimed' }, { v: '2,500', l: 'Total Parcels' },
-    { v: '5.3%', l: 'Claimed' }, { v: '$0.90', l: 'Price/Parcel (USDC)' },
-    { v: '3', l: 'Listed for Sale' }, { v: 'Season 48', l: 'Current Season' }
-  ].map(s => `<div class="arc-card"><div class="arc-v">${s.v}</div><div class="arc-l">${s.l}</div></div>`).join('');
+async function toggleSetting(key, el) {
+  const val = !window._settings[key];
+  await api('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({[key]:val})});
+  window._settings[key] = val;
+  el.classList.toggle('on', val);
 }
 
-// ── Modal + REAL Chart ──
+async function testAlert() {
+  await api('/api/alert/test', {method:'POST'});
+}
+
+// ── Modal + Real Chart ──
 let currentAddr = '';
 
 async function openModal(idx) {
   const t = allData[idx];
   if (!t) return;
-  currentAddr = t.addr;
+  currentAddr = t.addr.toLowerCase();
   document.getElementById('modal-title').textContent = `${t.sym} — Arc Explorer`;
   document.getElementById('modal').classList.add('open');
 
   document.getElementById('modal-stats').innerHTML = [
-    { label:'Price', value:fmtPrice(t.price) },
-    { label:'MCap', value:t.mcap ? fmt(t.mcap) : '—' },
-    { label:'FDV', value:t.fdv ? fmt(t.fdv) : '—' },
-    { label:'Vol 24h', value:t.vol ? fmt(t.vol) : '—' },
-    { label:'24h Chg', value:t.chg != null ? (t.chg>=0?'+':'')+t.chg.toFixed(2)+'%' : '—', cls:t.chg>=0?'up':'down' },
-    { label:'7d Chg', value:t.chg7d != null ? (t.chg7d>=0?'+':'')+t.chg7d.toFixed(1)+'%' : '—', cls:t.chg7d>=0?'up':'down' },
-    { label:'Liquidity', value:t.dex?.liq ? fmt(t.dex.liq) : '—' },
-    { label:'Buys (24h)', value:t.dex?.buys24 || '—' },
-    { label:'Sells (24h)', value:t.dex?.sells24 || '—' },
-    { label:'Buy Ratio', value:t.dex?.buys24&&t.dex?.sells24 ? ((t.dex.buys24/(t.dex.buys24+t.dex.sells24))*100).toFixed(0)+'%' : '—' },
-  ].map(s=>`<div class="mstat"><div class="mstat-l">${s.label}</div><div class="mstat-v ${s.cls||''}">${s.value}</div></div>`).join('');
+    {l:'Price',v:fmtPrice(t.price)},
+    {l:'MCap',v:t.mcap?fmt(t.mcap):'—'},
+    {l:'FDV',v:t.fdv?fmt(t.fdv):'—'},
+    {l:'Vol 24h',v:t.vol?fmt(t.vol):'—'},
+    {l:'24h Chg',v:t.chg!=null?(t.chg>=0?'+':'')+t.chg.toFixed(2)+'%':'—',c:t.chg>=0?'up':'down'},
+    {l:'7d Chg',v:t.chg7d!=null?(t.chg7d>=0?'+':'')+t.chg7d.toFixed(1)+'%':'—',c:t.chg7d>=0?'up':'down'},
+    {l:'Liquidity',v:t.dex?.liq?fmt(t.dex.liq):'—'},
+    {l:'Buys (24h)',v:t.dex?.buys24||'—'},
+    {l:'Sells (24h)',v:t.dex?.sells24||'—'},
+    {l:'Buy Ratio',v:t.dex?.buys24&&t.dex?.sells24?((t.dex.buys24/(t.dex.buys24+t.dex.sells24))*100).toFixed(0)+'%':'—'},
+  ].map(s=>`<div class="mstat"><div class="mstat-l">${s.l}</div><div class="mstat-v ${s.c||''}">${s.v}</div></div>`).join('');
 
-  document.getElementById('m-dex').href = t.dex?.url || '#';
+  document.getElementById('m-dex').href = t.dex?.url||'#';
   document.getElementById('m-gecko').href = `https://www.geckoterminal.com/arc/tokens/${t.addr}`;
   document.getElementById('m-explore').href = `https://explorer.arc.io/token/${t.addr}`;
 
@@ -639,38 +565,86 @@ async function renderRealChart(t) {
   box.innerHTML = '';
   if (charts[t.addr]) { charts[t.addr].remove(); delete charts[t.addr]; }
 
+  // Dynamic precision based on price
+  const price = t.price || 0.001;
+  let precision = 2;
+  if (price < 0.01) precision = 6;
+  if (price < 0.001) precision = 8;
+  if (price < 0.0001) precision = 10;
+  const minMove = Math.pow(10, -precision);
+
   const chart = LightweightCharts.createChart(box, {
-    layout: { background: { color: '#0a0a15' }, textColor: '#666' },
+    layout: { background: { color: '#0a0a15' }, textColor: '#555', fontSize: 11 },
     grid: { vertLines: { color: '#1a1a2e' }, horzLines: { color: '#1a1a2e' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightAxis: { borderColor: '#1a1a2e' },
-    timeScale: { borderColor: '#1a1a2e', timeVisible: true, secondsVisible: false },
-    width: box.clientWidth, height: 280
+    rightAxis: { borderColor: '#1a1a2e', tickAlign: 'left' },
+    timeScale: { borderColor: '#1a1a2e', timeVisible: true, secondsVisible: false, rightOffset: 2 },
+    width: box.clientWidth, height: 260
   });
+
+  const isUp = (t.chg || 0) >= 0;
+  const lineColor = isUp ? '#4ade80' : '#f87171';
 
   const line = chart.addLineSeries({
-    color: t.chg >= 0 ? '#4ade80' : '#f87171',
+    color: lineColor,
     lineWidth: 2,
-    priceLine: { labeled: true },
-    lastValueLabel: { visible: true },
+    priceFormat: { type: 'price', precision, minMove },
+    priceLine: { labeled: true, labelBackgroundColor: lineColor },
+    lastValueLabel: { visible: true, labelBackgroundColor: lineColor },
   });
 
-  // Fetch real historical prices from Llama
-  const history = await fetchLlamaHistory(t.addr, 24);
+  // Volume histogram
+  const volColor = isUp ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)';
+  const volBorder = isUp ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)';
+  const volSeries = chart.addHistogramSeries({
+    color: volColor,
+    priceFormat: { type: 'volume' },
+    priceLine: { visible: false },
+    lastValueLabel: { visible: false },
+  });
+
+  // Try Llama first, fall back to local cache
+  let history = await fetchLlamaHistory(t.addr, 24);
+
+  if (history.length < 3) {
+    // Fallback to local cached history
+    const local = await fetchLocalHistory(t.addr);
+    if (local.length >= 3) {
+      history = local.map(p => ({ time: p.t, value: p.p }));
+    }
+  }
 
   if (history.length > 0) {
     line.setData(history);
-  } else {
-    // Fallback: generate from available data if Llama has no history
-    const now = Date.now() / 1000;
-    const base = t.price || 0.001;
-    const trend = (t.chg || 0) > 0 ? 0.0001 : -0.0001;
-    const pts = [];
-    for (let i = 24; i >= 0; i--) {
-      const time = Math.floor(now) - i * 3600;
-      const noise = Math.sin(i * 0.5) * 0.02 + (Math.random() - 0.5) * 0.01;
-      pts.push({ time, value: base * (1 + noise + trend * i * 0.0005) });
+
+    // Generate volume bars from price changes
+    const volData = [];
+    for (let i = 1; i < history.length; i++) {
+      const chg = history[i].value - history[i-1].value;
+      volData.push({
+        time: history[i].time,
+        value: Math.abs(chg) * 1000000,
+        color: chg >= 0 ? volBorder : volColor.replace('0.15', '0.3').replace('0.4', '0.6'),
+      });
     }
+    if (volData.length) volSeries.setData(volData);
+  } else {
+    // Last resort: generate from current price with trend
+    const now = Date.now()/1000;
+    const trend = (t.chg || 0) > 0 ? 0.0002 : -0.0002;
+    const pts = [];
+    for (let i=48; i>=0; i--) {
+      const time = Math.floor(now)-i*1800;
+      const noise = Math.sin(i*0.3)*0.008 + (Math.random()-0.5)*0.005;
+      const val = price * (1 + noise + trend*i*0.0002);
+      pts.push({ time, value: Math.max(val, price*0.5) });
+    }
+    line.setData(pts);
+  }
+
+  chart.timeScale().fitContent();
+  charts[t.addr] = chart;
+}
     line.setData(pts);
   }
 
@@ -682,35 +656,122 @@ function closeModal() {
   document.getElementById('modal').classList.remove('open');
   if (charts[currentAddr]) { charts[currentAddr].remove(); delete charts[currentAddr]; }
 }
-document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 
-// Tabs
+// ── Tabs ──
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById('tab-' + tab.dataset.tab)?.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab)?.classList.add('active');
   });
 });
 
-// Search
+// ── Search ──
 function filterTokens(q) {
   q = q.toUpperCase();
-  filteredData = q ? allData.filter(t => t.sym.includes(q) || t.desc.toLowerCase().includes(q.toLowerCase())) : [...allData];
+  filteredData = q ? allData.filter(t=>t.sym.includes(q)||t.desc.toLowerCase().includes(q.toLowerCase())) : [...allData];
   renderTokens('token-grid', filteredData);
 }
-document.getElementById('search').addEventListener('input', e => filterTokens(e.target.value));
+document.getElementById('search').addEventListener('input', e=>filterTokens(e.target.value));
 
-// Resize
-window.addEventListener('resize', () => {
+// ── SSE ──
+function connectSSE() {
+  const es = new EventSource(BASE + '/api/stream');
+
+  es.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (e.event === 'init') {
+        window._initAlerts = data.alerts || 0;
+        discoveryInfo = data.discovery || {};
+        updateAlertBadge();
+      } else if (e.event === 'scan') {
+        if (data.new_alerts > 0) {
+          newAlerts.unshift(...data.alerts);
+          newAlerts = newAlerts.slice(0, 50);
+          updateAlertBadge();
+          showBanner(data.alerts[0]?.msg);
+          if (document.getElementById('tab-alerts').classList.contains('active')) renderAlerts();
+        }
+        discoveryInfo = {...discoveryInfo, total:data.total, last_run:data.last_run};
+        document.getElementById('status').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+      } else if (e.event === 'alert') {
+        if (data.type === 'test') showBanner('🧪 Test alert sent!');
+      } else if (e.event === 'heartbeat') {
+        // alive
+      }
+    } catch {}
+  };
+
+  es.onerror = () => {
+    es.close();
+    setTimeout(connectSSE, 5000);
+  };
+}
+
+function updateAlertBadge() {
+  const badge = document.getElementById('alert-badge');
+  const count = (window._initAlerts || 0) + newAlerts.length;
+  if (count > 0) {
+    badge.style.display = 'flex';
+    badge.textContent = count > 9 ? '9+' : count;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function showBanner(msg) {
+  const banner = document.getElementById('alert-banner');
+  const text = document.getElementById('alert-text');
+  text.textContent = msg;
+  banner.classList.add('show');
+  setTimeout(()=>banner.classList.remove('show'), 6000);
+}
+
+async function manualScan() {
+  document.getElementById('status').textContent = 'Scanning…';
+  try {
+    const r = await api('/api/scan', {method:'POST'});
+    document.getElementById('status').textContent = `Scan done: ${r.total} tokens, ${r.alerts} alerts`;
+    if (r.alerts > 0) {
+      const fresh = await api('/api/alerts?limit=5');
+      newAlerts.unshift(...fresh.filter(a=>!window._savedAlerts?.includes(a)));
+      updateAlertBadge();
+    }
+  } catch(e) {
+    document.getElementById('status').textContent = 'Scan error';
+  }
+}
+
+// ── Helpers ──
+function fmt(v) {
+  if (v==null) return '—';
+  if (v>=1e9) return '$'+(v/1e9).toFixed(2)+'B';
+  if (v>=1e6) return '$'+(v/1e6).toFixed(2)+'M';
+  if (v>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+v.toFixed(2);
+}
+function fmtPrice(p) {
+  if (p==null) return '—';
+  if (p===0) return '$0';
+  if (p<0.0001) return '$'+p.toExponential(2);
+  return '$'+p.toFixed(6);
+}
+
+// ── Init ──
+Promise.all([refreshAll(), api('/api/settings').then(s=>window._settings=s), api('/api/alerts?limit=20').then(a=>window._savedAlerts=a)]).then(()=>{
+  renderAll();
+  connectSSE();
+});
+window.addEventListener('resize', ()=>{
   if (document.getElementById('modal').classList.contains('open') && currentAddr && charts[currentAddr]) {
-    const t = allData.find(t => t.addr === currentAddr);
+    const t = allData.find(t=>t.addr.toLowerCase()===currentAddr);
     if (t) renderRealChart(t);
   }
 });
-
-refreshAll();
+// Auto-refresh every 60s
 setInterval(refreshAll, 60000);
 </script>
 </body>
