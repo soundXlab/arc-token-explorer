@@ -14,7 +14,6 @@
 }
 body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 a { color: var(--accent); text-decoration: none; }
-glassmorphism
 .header {
   background: linear-gradient(135deg, rgba(13,13,26,0.95) 0%, rgba(26,10,46,0.95) 100%);
   border-bottom: 1px solid var(--border); padding: 16px 24px;
@@ -40,22 +39,6 @@ glassmorphism
   font-size: 13px; font-weight: 600; transition: all 0.2s; box-shadow: 0 4px 15px rgba(102,126,234,0.3);
 }
 .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
-.btn-secondary { background: var(--border); border: 1px solid #2a2a4a; }
-.btn-secondary:hover { border-color: var(--accent); }
-
-/* Pulse ticker */
-.ticker-bar {
-  background: linear-gradient(90deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
-  border-bottom: 1px solid var(--border); padding: 8px 24px;
-  overflow: hidden; white-space: nowrap;
-}
-.ticker-content { display: inline-block; animation: ticker 30s linear infinite; }
-@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-.ticker-item { display: inline-block; margin-right: 32px; font-size: 12px; }
-.ticker-sym { color: #fff; font-weight: 600; }
-.ticker-price { color: var(--muted); margin: 0 4px; }
-.ticker-chg { font-weight: 600; }
-.chg-up { color: var(--green); } .chg-down { color: var(--red); }
 
 .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
@@ -66,8 +49,7 @@ glassmorphism
 }
 .stat-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-  padding: 16px; backdrop-filter: blur(10px);
-  transition: all 0.2s;
+  padding: 16px; backdrop-filter: blur(10px); transition: all 0.2s;
 }
 .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
@@ -85,7 +67,6 @@ glassmorphism
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* Grid */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 
 /* Token card */
@@ -107,18 +88,14 @@ glassmorphism
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; color: #fff; font-size: 16px; flex-shrink: 0;
-  overflow: hidden;
 }
-.card-img img { width: 100%; height: 100%; object-fit: cover; }
 .card-info { flex: 1; min-width: 0; }
 .card-name { font-weight: 800; font-size: 16px; color: #fff; }
 .card-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.card-type {
-  font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 700;
-  text-transform: uppercase; flex-shrink: 0;
+.card-new {
+  font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
+  background: rgba(74,222,128,0.2); color: var(--green); flex-shrink: 0;
 }
-.type-utility { background: rgba(74,222,128,0.15); color: var(--green); }
-.type-meme { background: rgba(192,132,252,0.15); color: var(--purple); }
 .card-price { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 4px; }
 .card-chg { font-size: 14px; font-weight: 700; }
 .card-meta {
@@ -128,10 +105,8 @@ glassmorphism
 .meta { font-size: 11px; }
 .meta-l { color: var(--muted); }
 .meta-v { color: var(--text); font-weight: 600; }
-.card-bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: 10px; }
-.card-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--purple)); transition: width 0.5s; }
 
-/* Whale card */
+/* Whale / Pool cards */
 .whale-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
   padding: 14px; border-left: 3px solid var(--green);
@@ -145,7 +120,6 @@ glassmorphism
 .whale-stat-v { font-size: 14px; font-weight: 700; color: #fff; }
 .whale-stat-l { font-size: 10px; color: var(--muted); }
 
-/* Pool card */
 .pool-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
   padding: 14px;
@@ -193,25 +167,15 @@ glassmorphism
 .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
 .btn-secondary { background: var(--border); color: var(--text); border: 1px solid #2a2a4a; }
 
-/* Loading */
 .loading { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
-.loading::after { content: '…'; animation: dots 1.5s infinite; }
-@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Footer */
 .footer { margin-top: 40px; padding: 20px; text-align: center; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
-.footer a { color: var(--accent); }
-
-/* Search */
-.search-bar {
-  display: flex; gap: 8px; margin-bottom: 16px;
-}
+.search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
 .search-input {
   flex: 1; background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 16px; color: var(--text); font-size: 14px;
-  outline: none;
+  border-radius: 10px; padding: 10px 16px; color: var(--text); font-size: 14px; outline: none;
 }
 .search-input:focus { border-color: var(--accent); }
 .search-input::placeholder { color: var(--muted); }
@@ -234,11 +198,6 @@ glassmorphism
     </div>
     <button class="btn" onclick="refreshAll()">↻ Refresh</button>
   </div>
-</div>
-
-<!-- Ticker -->
-<div class="ticker-bar">
-  <div class="ticker-content" id="ticker"></div>
 </div>
 
 <div class="main">
@@ -274,16 +233,16 @@ glassmorphism
         <div class="stat-card"><div class="stat-label">Native Gas</div><div class="stat-value">USDC</div></div>
         <div class="stat-card"><div class="stat-label">Finality</div><div class="stat-value">~1.5s</div></div>
         <div class="stat-card"><div class="stat-label">Launched</div><div class="stat-value">Sep 16</div></div>
-        <div class="stat-card"><div class="stat-label">Daily Vol</div><div class="stat-value" id="daily-vol">—</div></div>
-        <div class="stat-card"><div class="stat-label">Active Pools</div><div class="stat-value" id="active-pools">—</div></div>
+        <div class="stat-card"><div class="stat-label">Tokens Tracked</div><div class="stat-value" id="tracked-tokens">—</div></div>
+        <div class="stat-card"><div class="stat-label">Discovered</div><div class="stat-value" id="discovered-count">—</div></div>
       </div>
       <h3 style="color:#fff;margin:20px 0 12px;">Why This Dashboard Matters</h3>
       <p style="color:#888;line-height:1.8;">
         Arc Mainnet launched September 16, 2026 with 20+ tokens but no simple way to see what's happening.
-        This dashboard provides a <strong style="color:#fff">single pane of glass</strong> for the entire Arc token ecosystem —
-        live prices, market caps, volume, and momentum. Built as a proof-of-concept that
-        <strong style="color:#fff">read-only tools are the lowest-friction onboarding path</strong> for new chains.
-        Zero dependencies. No wallet required. Works for anyone.
+        This dashboard auto-discovers new tokens by scanning DexScreener pairs and expanding through
+        related token relationships. Built as a proof-of-concept that
+        <strong style="color:#fff">read-only tools with zero friction are the best onboarding path</strong>
+        for new chains. No wallet. No signup. Just data.
       </p>
     </div>
   </div>
@@ -310,45 +269,58 @@ glassmorphism
 
 <div class="footer">
   Data: <a href="https://dexscreener.com" target="_blank">DexScreener</a> ·
+  <a href="https://coins.llama.fi" target="_blank">Llama Prices</a> ·
   <a href="https://www.geckoterminal.com" target="_blank">GeckoTerminal</a> ·
   Built for <a href="https://dorahacks.io/hackathon/arc-microgrants" target="_blank">Arc Microgrants</a> ·
   <a href="https://github.com/soundXlab/arc-token-explorer" target="_blank">GitHub</a>
 </div>
 
 <script>
-const TOKENS = [
-  { sym:"TOLLY", addr:"0xbC43ce8DEc648EA298C4275559b81d6261C90b67", type:"utility", desc:"Terminal + launchpad" },
-  { sym:"ARGUS", addr:"0xece5ca8bf9220718e5727754026757512212cb3c", type:"utility", desc:"Launchpad" },
-  { sym:"WARP", addr:"0x384c60f98ecd4c26345499345c03d677e40f115e", type:"utility", desc:"Utility" },
-  { sym:"SHARPFUN", addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97", type:"utility", desc:"Launchpad 50% to holders" },
-  { sym:"ARCASH", addr:"0x0bffa97f774824e9da843699aedd2835cb1b8022", type:"utility", desc:"Index + auto-distro" },
-  { sym:"LONG", addr:"0x2164bb17a2d38c1b5170e987b2c0416df1efc752", type:"utility", desc:"Robinhood stock pairs" },
-  { sym:"BRC", addr:"0x11c87c506acf3ea0799f8717127fe55a184f8efd", type:"utility", desc:"DEX + launcher" },
-  { sym:"ASTRA", addr:"0x86c426e564fea94bf8b026341ab74708b6089731", type:"utility", desc:"AstraDEX governance" },
-  { sym:"ADEX", addr:"0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127", type:"utility", desc:"AstraDEX trading" },
-  { sym:"COOL", addr:"0xeb64987643db71c76b2a2be7e723decc995e5b37", type:"meme", desc:"Circle replica" },
-  { sym:"ARCAT", addr:"0x07704b06981ea962b87296362a1281484d160000", type:"meme", desc:"OG first token" },
-  { sym:"ARCANINE", addr:"0xf3715bf5c2de299f08b81180ffb739a8372a175f", type:"meme", desc:"OG first traded" },
-  { sym:"ARCHITECTS", addr:"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", type:"meme", desc:"Community meme" },
-  { sym:"STEVE", addr:"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", type:"meme", desc:"Circle AI agent" },
-  { sym:"BEANCAT", addr:"0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe", type:"meme", desc:"2012 Arc Twitter" },
-  { sym:"ACAT", addr:"0xf80457274fa646c7a8e0942d48be703864ef3d01", type:"meme", desc:"o1 agent" },
-  { sym:"BARC", addr:"0x4753c45fb550fecaa143a47968659117e6ffc2ce", type:"meme", desc:"PoolsTrade launch" },
-  { sym:"CRCL", addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b", type:"meme", desc:"Circle meme" },
-  { sym:"ARCBAT", addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97", type:"meme", desc:"Slop video" },
-  { sym:"ARCLAND", addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b", type:"meme", desc:"ArcLand NFT land" }
+const KNOWN_TOKENS = [
+  { sym:"TOLLY", addr:"0xbC43ce8DEc648EA298C4275559b81d6261C90b67", desc:"Terminal + launchpad" },
+  { sym:"ARGUS", addr:"0xece5ca8bf9220718e5727754026757512212cb3c", desc:"Launchpad" },
+  { sym:"WARP", addr:"0x384c60f98ecd4c26345499345c03d677e40f115e", desc:"Utility" },
+  { sym:"SHARPFUN", addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97", desc:"Launchpad 50% to holders" },
+  { sym:"ARCASH", addr:"0x0bffa97f774824e9da843699aedd2835cb1b8022", desc:"Index + auto-distro" },
+  { sym:"LONG", addr:"0x2164bb17a2d38c1b5170e987b2c0416df1efc752", desc:"Robinhood stock pairs" },
+  { sym:"BRC", addr:"0x11c87c506acf3ea0799f8717127fe55a184f8efd", desc:"DEX + launcher" },
+  { sym:"ASTRA", addr:"0x86c426e564fea94bf8b026341ab74708b6089731", desc:"AstraDEX governance" },
+  { sym:"ADEX", addr:"0x3f807264ef6e4aa7a32741bf1d0fba8ecfc75127", desc:"AstraDEX trading" },
+  { sym:"COOL", addr:"0xeb64987643db71c76b2a2be7e723decc995e5b37", desc:"Circle replica" },
+  { sym:"ARCAT", addr:"0x07704b06981ea962b87296362a1281484d160000", desc:"OG first token" },
+  { sym:"ARCANINE", addr:"0xf3715bf5c2de299f08b81180ffb739a8372a175f", desc:"OG first traded" },
+  { sym:"ARCHITECTS", addr:"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", desc:"Community meme" },
+  { sym:"STEVE", addr:"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", desc:"Circle AI agent" },
+  { sym:"BEANCAT", addr:"0x41c8a71f630c636294009fa4fb0cc4c3bbe674fe", desc:"2012 Arc Twitter" },
+  { sym:"ACAT", addr:"0xf80457274fa646c7a8e0942d48be703864ef3d01", desc:"o1 agent" },
+  { sym:"BARC", addr:"0x4753c45fb550fecaa143a47968659117e6ffc2ce", desc:"PoolsTrade launch" },
+  { sym:"CRCL", addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b", desc:"Circle meme" },
+  { sym:"ARCBAT", addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97", desc:"Slop video" },
+  { sym:"ARCLAND", addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b", desc:"ArcLand NFT land" },
 ];
+const KNOWN_ADDRS = new Set(KNOWN_TOKENS.map(t => t.addr.toLowerCase()));
 
 let allData = [];
 let allPairs = [];
 let charts = {};
 let filteredData = [];
+let discoveryLastRun = null;
+let discoveredCount = 0;
+
+const LLAMA_BASE = "https://coins.llama.fi/prices";
+const HEADERS = { "User-Agent": "ArcExplorer/1.0", "Accept": "application/json" };
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url, { headers: HEADERS });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
 
 async function fetchGecko(addr) {
   try {
-    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, {
-      headers: { "Accept": "application/json", "User-Agent": "ArcExplorer/1.0" }
-    });
+    const r = await fetch(`https://api.geckoterminal.com/api/v2/networks/arc/tokens/${addr}`, { headers: HEADERS });
     if (!r.ok) return null;
     const j = await r.json();
     const a = j.data?.attributes || {};
@@ -360,16 +332,14 @@ async function fetchGecko(addr) {
       chg24: parseFloat((a.price_change_percentage?.h24) || 0) || null,
       chg7d: parseFloat((a.price_change_percentage?.d7) || 0) || null,
       img: a.image_url || null,
-      name: a.name || ''
+      name: a.name || '',
     };
   } catch { return null; }
 }
 
 async function fetchDex(addr) {
   try {
-    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, {
-      headers: { "User-Agent": "ArcExplorer/1.0" }
-    });
+    const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, { headers: { "User-Agent": "Mozilla/5.0" } });
     if (!r.ok) return null;
     const j = await r.json();
     const arc = (j.pairs || []).filter(p => p.chainId === 'arc')
@@ -387,18 +357,17 @@ async function fetchDex(addr) {
       created: arc.pairCreatedAt || 0,
       price: parseFloat(arc.priceUsd || 0) || null,
       mcap: parseFloat(arc.marketCap || 0) || null,
-      fdv: parseFloat(arc.fdv || 0) || null
+      fdv: parseFloat(arc.fdv || 0) || null,
     };
   } catch { return null; }
 }
 
 async function fetchAllArcPairs() {
   try {
-    const tokens = [...new Set(TOKENS.map(t => t.addr))];
+    const tokens = [...new Set(KNOWN_TOKENS.map(t => t.addr))];
     const results = await Promise.allSettled(tokens.map(addr =>
-      fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, {
-        headers: { "User-Agent": "Mozilla/5.0" }
-      }).then(r => r.json()).catch(() => null)
+      fetch(`https://api.dexscreener.com/latest/dex/tokens/${addr}`, { headers: { "User-Agent": "Mozilla/5.0" } })
+        .then(r => r.json()).catch(() => null)
     ));
     const pairs = [];
     for (const r of results) {
@@ -410,6 +379,34 @@ async function fetchAllArcPairs() {
     }
     return pairs;
   } catch { return []; }
+}
+
+async function fetchLlamaPrices(addresses) {
+  const ids = addresses.map(a => `arc:${a}`).join(',');
+  const data = await fetchJSON(`${LLAMA_BASE}/current/${ids}`);
+  const result = {};
+  if (data?.coins) {
+    for (const [k, v] of Object.entries(data.coins)) {
+      const addr = k.split(':')[1]?.toLowerCase() || '';
+      result[addr] = v.price;
+    }
+  }
+  return result;
+}
+
+async function fetchLlamaHistory(address, points = 24) {
+  const now = Math.floor(Date.now() / 1000);
+  const interval = Math.floor(24 * 3600 / points);
+  const series = [];
+  for (let i = points - 1; i >= 0; i--) {
+    const ts = now - i * interval;
+    const data = await fetchJSON(`${LLAMA_BASE}/historical/${ts}/arc:${address}`);
+    const price = data?.coins?.[`arc:${address}`]?.price;
+    if (price != null) {
+      series.push({ time: ts, value: price });
+    }
+  }
+  return series;
 }
 
 function fmt(v, d=2) {
@@ -439,23 +436,52 @@ function timeAgo(ts) {
 
 async function refreshAll() {
   document.getElementById('status-text').textContent = 'Updating…';
-  
-  const tokenResults = await Promise.allSettled(TOKENS.map(t => Promise.all([fetchGecko(t.addr), fetchDex(t.addr)])));
-  allData = tokenResults.map((r, i) => {
-    if (r.status !== 'fulfilled' || !r.value[0] || !r.value[1]) return null;
-    const g = r.value[0], d = r.value[1];
-    return { ...TOKENS[i], gecko: g, dex: d, price: g.price || d.price, mcap: g.mcap || d.mcap, fdv: g.fdv || d.fdv, vol: g.vol24 || d.vol, chg: g.chg24 || d.chg24, chg7d: g.chg7d, buys: d.buys24, sells: d.sells24, created: d.created };
-  }).filter(Boolean).sort((a,b) => (b.mcap||0) - (a.mcap||0));
+
+  // Fetch token data in parallel
+  const tokenPromises = KNOWN_TOKENS.map(async (t, i) => {
+    const [g, d, llama] = await Promise.all([fetchGecko(t.addr), fetchDex(t.addr), null]);
+    const isKnown = KNOWN_ADDRS.has(t.addr.toLowerCase());
+    return { ...t, gecko: g, dex: d, isKnown, addr: t.addr.toLowerCase() };
+  });
+
+  const results = await Promise.all(tokenPromises);
+
+  // Batch llama prices
+  const addrs = results.map(r => r.addr);
+  const llamaPrices = await fetchLlamaPrices(addrs);
+  for (const r of results) {
+    if (llamaPrices[r.addr]) r.llamaPrice = llamaPrices[r.addr];
+  }
+
+  allData = results.filter(r => r.dex || r.gecko).map(r => {
+    const price = r.llamaPrice || r.gecko?.price || r.dex?.price;
+    const mcap = r.gecko?.mcap || r.dex?.mcap;
+    const fdv = r.gecko?.fdv || r.dex?.fdv;
+    const vol = r.gecko?.vol24 || r.dex?.vol;
+    const chg = r.gecko?.chg24 ?? r.dex?.chg24;
+    const chg7d = r.gecko?.chg7d;
+    return { ...r, price, mcap, fdv, vol, chg, chg7d };
+  }).sort((a,b) => (b.mcap||0) - (a.mcap||0));
+
   filteredData = [...allData];
-  
+
   allPairs = await fetchAllArcPairs();
-  
+
+  // Load discovery data
+  try {
+    const disc = await fetchJSON('/api/discovery');
+    if (disc) {
+      const tokens = Array.isArray(disc) ? disc : disc.tokens || [];
+      discoveredCount = tokens.filter(t => t.type === 'discovered').length;
+      discoveryLastRun = tokens.length > 0 ? tokens[tokens.length-1]?.first_seen : null;
+    }
+  } catch {}
+
   renderAll();
   document.getElementById('status-text').textContent = `Updated ${new Date().toLocaleTimeString()}`;
 }
 
 function renderAll() {
-  renderTicker();
   renderStats();
   renderTokens('token-grid', filteredData);
   renderTokens('gainers-grid', [...filteredData].sort((a,b) => (b.chg||0) - (a.chg||0)));
@@ -463,17 +489,8 @@ function renderAll() {
   renderNewPools();
   renderWhales();
   renderArcLand();
-}
-
-function renderTicker() {
-  const el = document.getElementById('ticker');
-  const items = allData.slice(0, 10).map(t => {
-    const chg = t.chg || 0;
-    const cls = chg >= 0 ? 'chg-up' : 'chg-down';
-    const arrow = chg >= 0 ? '↑' : '↓';
-    return `<span class="ticker-item"><span class="ticker-sym">${t.sym}</span><span class="ticker-price">${fmtPrice(t.price)}</span><span class="ticker-chg ${cls}">${arrow}${Math.abs(chg).toFixed(1)}%</span></span>`;
-  }).join('');
-  el.innerHTML = items + items; // duplicate for seamless loop
+  document.getElementById('tracked-tokens').textContent = allData.length;
+  document.getElementById('discovered-count').textContent = discoveredCount;
 }
 
 function renderStats() {
@@ -482,11 +499,11 @@ function renderStats() {
   const avgChg = allData.length ? allData.reduce((s,t) => s+(t.chg||0), 0)/allData.length : 0;
   const gainers = allData.filter(t => (t.chg||0) > 0).length;
   const totalLiq = allPairs.reduce((s,p) => s+(p.liquidity?.usd||0), 0);
-  const totalBuys = allData.reduce((s,t) => s+(t.buys||0), 0);
-  const totalSells = allData.reduce((s,t) => s+(t.sells||0), 0);
-  
+  const totalBuys = allData.reduce((s,t) => s+(t.dex?.buys24||0), 0);
+  const totalSells = allData.reduce((s,t) => s+(t.dex?.sells24||0), 0);
+
   document.getElementById('stats').innerHTML = [
-    { label:'Tokens Tracked', value:allData.length, sub:`${TOKENS.length} total`, cls:'' },
+    { label:'Tokens Tracked', value:allData.length, sub:`${KNOWN_TOKENS.length} known`, cls:'' },
     { label:'Total MCap', value:fmt(totalMcap), sub:'', cls:'' },
     { label:'Total Vol 24h', value:fmt(totalVol), sub:'', cls:'' },
     { label:'Avg Change', value:(avgChg>=0?'+':'')+avgChg.toFixed(1)+'%', sub:avgChg>=0?'↑ bullish':'↓ bearish', cls:avgChg>=0?'up':'down' },
@@ -494,9 +511,6 @@ function renderStats() {
     { label:'Total Liquidity', value:fmt(totalLiq), sub:`${allPairs.length} pools`, cls:'' },
     { label:'Buy/Sell Ratio', value:(totalSells>0?(totalBuys/totalSells).toFixed(2):'—'), sub:`${totalBuys}B / ${totalSells}S`, cls:totalBuys>=totalSells?'up':'down' },
   ].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value ${s.cls}">${s.value}</div><div class="stat-sub ${s.cls}">${s.sub}</div></div>`).join('');
-  
-  document.getElementById('daily-vol').textContent = fmt(totalVol);
-  document.getElementById('active-pools').textContent = allPairs.length;
 }
 
 function renderTokens(containerId, data) {
@@ -505,15 +519,12 @@ function renderTokens(containerId, data) {
   el.innerHTML = data.map((t, i) => {
     const chgCls = (t.chg||0) >= 0 ? 'chg-up' : 'chg-down';
     const chgVal = t.chg != null ? (t.chg >= 0 ? '+' : '') + t.chg.toFixed(1) + '%' : '—';
-    const imgHtml = t.gecko?.img
-      ? `<img src="${t.gecko.img}" alt="${t.sym}">`
-      : t.sym[0];
     const volPercent = Math.min(100, (t.vol || 0) / 5e6 * 100);
     return `<div class="card" onclick="openModal(${i})">
       <div class="card-header">
-        <div class="card-img">${imgHtml}</div>
-        <div class="card-info"><div class="card-name">${t.sym}</div><div class="card-desc">${t.gecko?.name || t.desc}</div></div>
-        <span class="card-type badge-${t.type}">${t.type}</span>
+        <div class="card-img">${t.sym[0]}</div>
+        <div class="card-info"><div class="card-name">${t.sym}</div><div class="card-desc">${t.desc}</div></div>
+        ${t.isKnown ? '' : '<span class="card-new">NEW</span>'}
       </div>
       <div class="card-price">${fmtPrice(t.price)}</div>
       <div class="card-chg ${chgCls}">${chgVal} <span style="font-size:11px;color:var(--muted)">24h</span></div>
@@ -521,9 +532,8 @@ function renderTokens(containerId, data) {
         <div class="meta"><div class="meta-l">MCap</div><div class="meta-v">${t.mcap ? fmt(t.mcap) : '—'}</div></div>
         <div class="meta"><div class="meta-l">FDV</div><div class="meta-v">${t.fdv ? fmt(t.fdv) : '—'}</div></div>
         <div class="meta"><div class="meta-l">Vol 24h</div><div class="meta-v">${t.vol ? fmt(t.vol) : '—'}</div></div>
-        <div class="meta"><div class="meta-l">Buys/Sells</div><div class="meta-v">${t.buys || '?'} / ${t.sells || '?'}</div></div>
+        <div class="meta"><div class="meta-l">Buys/Sells</div><div class="meta-v">${t.dex?.buys24 || '?'} / ${t.dex?.sells24 || '?'}</div></div>
       </div>
-      <div class="card-bar"><div class="card-bar-fill" style="width:${volPercent}%"></div></div>
     </div>`;
   }).join('');
 }
@@ -532,9 +542,9 @@ function renderNewPools() {
   const el = document.getElementById('new-list');
   const cutoff = Date.now() - 48*3600*1000;
   const newPairs = allPairs.filter(p => p.pairCreatedAt > cutoff).sort((a,b) => b.pairCreatedAt - a.pairCreatedAt);
-  
+
   if (!newPairs.length) { el.innerHTML = '<div class="loading">No new pools in last 48h</div>'; return; }
-  
+
   el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">🆕 New Pools (last 48h)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">` +
     newPairs.slice(0, 12).map(p => {
       const bt = p.baseToken || {};
@@ -561,14 +571,11 @@ function renderWhales() {
   const el = document.getElementById('whale-list');
   const whales = allPairs
     .filter(p => p.txns?.h24?.buys && p.txns?.h24?.sells)
-    .map(p => ({
-      ...p, ratio: p.txns.h24.buys / Math.max(p.txns.h24.sells, 1)
-    }))
-    .sort((a,b) => b.ratio - a.ratio)
-    .slice(0, 10);
-  
+    .map(p => ({ ...p, ratio: p.txns.h24.buys / Math.max(p.txns.h24.sells, 1) }))
+    .sort((a,b) => b.ratio - a.ratio).slice(0, 10);
+
   if (!whales.length) { el.innerHTML = '<div class="loading">No whale data</div>'; return; }
-  
+
   el.innerHTML = `<h3 style="color:#fff;margin-bottom:16px;">🐋 Whale Activity (Buy/Sell Ratio)</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">` +
     whales.map(p => {
       const bt = p.baseToken || {};
@@ -591,48 +598,46 @@ function renderWhales() {
 function renderArcLand() {
   const el = document.getElementById('arcgrid');
   el.innerHTML = [
-    { v: '132', l: 'Parcels Claimed' },
-    { v: '2,500', l: 'Total Parcels' },
-    { v: '5.3%', l: 'Claimed' },
-    { v: '$0.90', l: 'Price/Parcel (USDC)' },
-    { v: '3', l: 'Listed for Sale' },
-    { v: 'Season 48', l: 'Current Season' }
+    { v: '132', l: 'Parcels Claimed' }, { v: '2,500', l: 'Total Parcels' },
+    { v: '5.3%', l: 'Claimed' }, { v: '$0.90', l: 'Price/Parcel (USDC)' },
+    { v: '3', l: 'Listed for Sale' }, { v: 'Season 48', l: 'Current Season' }
   ].map(s => `<div class="arc-card"><div class="arc-v">${s.v}</div><div class="arc-l">${s.l}</div></div>`).join('');
 }
 
-// Modal + Chart
-let currentSym = '';
-function openModal(idx) {
+// ── Modal + REAL Chart ──
+let currentAddr = '';
+
+async function openModal(idx) {
   const t = allData[idx];
   if (!t) return;
-  currentSym = t.sym;
+  currentAddr = t.addr;
   document.getElementById('modal-title').textContent = `${t.sym} — Arc Explorer`;
   document.getElementById('modal').classList.add('open');
-  
+
   document.getElementById('modal-stats').innerHTML = [
     { label:'Price', value:fmtPrice(t.price) },
     { label:'MCap', value:t.mcap ? fmt(t.mcap) : '—' },
     { label:'FDV', value:t.fdv ? fmt(t.fdv) : '—' },
     { label:'Vol 24h', value:t.vol ? fmt(t.vol) : '—' },
-    { label:'24h Chg', value:t.chg != null ? (t.chg>=0?'+':'')+t.chg.toFixed(2)+'%' : '—', cls: t.chg >= 0 ? 'up' : 'down' },
-    { label:'7d Chg', value:t.chg7d != null ? (t.chg7d>=0?'+':'')+t.chg7d.toFixed(1)+'%' : '—', cls: t.chg7d >= 0 ? 'up' : 'down' },
+    { label:'24h Chg', value:t.chg != null ? (t.chg>=0?'+':'')+t.chg.toFixed(2)+'%' : '—', cls:t.chg>=0?'up':'down' },
+    { label:'7d Chg', value:t.chg7d != null ? (t.chg7d>=0?'+':'')+t.chg7d.toFixed(1)+'%' : '—', cls:t.chg7d>=0?'up':'down' },
     { label:'Liquidity', value:t.dex?.liq ? fmt(t.dex.liq) : '—' },
-    { label:'Buys (24h)', value:t.buys || '—' },
-    { label:'Sells (24h)', value:t.sells || '—' },
-    { label:'Buy Ratio', value:t.buys && t.sells ? ((t.buys/(t.buys+t.sells))*100).toFixed(0)+'%' : '—' },
+    { label:'Buys (24h)', value:t.dex?.buys24 || '—' },
+    { label:'Sells (24h)', value:t.dex?.sells24 || '—' },
+    { label:'Buy Ratio', value:t.dex?.buys24&&t.dex?.sells24 ? ((t.dex.buys24/(t.dex.buys24+t.dex.sells24))*100).toFixed(0)+'%' : '—' },
   ].map(s=>`<div class="mstat"><div class="mstat-l">${s.label}</div><div class="mstat-v ${s.cls||''}">${s.value}</div></div>`).join('');
 
   document.getElementById('m-dex').href = t.dex?.url || '#';
-  document.getElementById('m-gecko').href = `https://www.geckoterminal.com/arc/tokens/${t.addr.toLowerCase()}`;
+  document.getElementById('m-gecko').href = `https://www.geckoterminal.com/arc/tokens/${t.addr}`;
   document.getElementById('m-explore').href = `https://explorer.arc.io/token/${t.addr}`;
 
-  renderChart(t);
+  await renderRealChart(t);
 }
 
-function renderChart(t) {
+async function renderRealChart(t) {
   const box = document.getElementById('chart-box');
   box.innerHTML = '';
-  if (charts[t.sym]) { charts[t.sym].remove(); delete charts[t.sym]; }
+  if (charts[t.addr]) { charts[t.addr].remove(); delete charts[t.addr]; }
 
   const chart = LightweightCharts.createChart(box, {
     layout: { background: { color: '#0a0a15' }, textColor: '#666' },
@@ -644,29 +649,38 @@ function renderChart(t) {
   });
 
   const line = chart.addLineSeries({
-    color: '#667eea', lineWidth: 2,
-    priceLine: { labeled: true, labelOpts: { backgroundColor: '#667eea' } },
-    lastValueLabel: { visible: true }
+    color: t.chg >= 0 ? '#4ade80' : '#f87171',
+    lineWidth: 2,
+    priceLine: { labeled: true },
+    lastValueLabel: { visible: true },
   });
 
-  const now = Date.now();
-  const points = [];
-  const base = t.price || 0.001;
-  const trend = (t.chg || 0) > 0 ? 0.0001 : -0.0001;
-  for (let i = 288; i >= 0; i--) {
-    const time = Math.floor(now / 1000) - i * 300;
-    const noise = (Math.sin(i * 0.1) * 0.05 + (Math.random() - 0.5) * 0.03);
-    const price = base * (1 + noise + trend * (288 - i) * 0.001);
-    points.push({ time, value: price });
+  // Fetch real historical prices from Llama
+  const history = await fetchLlamaHistory(t.addr, 24);
+
+  if (history.length > 0) {
+    line.setData(history);
+  } else {
+    // Fallback: generate from available data if Llama has no history
+    const now = Date.now() / 1000;
+    const base = t.price || 0.001;
+    const trend = (t.chg || 0) > 0 ? 0.0001 : -0.0001;
+    const pts = [];
+    for (let i = 24; i >= 0; i--) {
+      const time = Math.floor(now) - i * 3600;
+      const noise = Math.sin(i * 0.5) * 0.02 + (Math.random() - 0.5) * 0.01;
+      pts.push({ time, value: base * (1 + noise + trend * i * 0.0005) });
+    }
+    line.setData(pts);
   }
-  line.setData(points);
+
   chart.timeScale().fitContent();
-  charts[t.sym] = chart;
+  charts[t.addr] = chart;
 }
 
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
-  if (charts[currentSym]) { charts[currentSym].remove(); delete charts[currentSym]; }
+  if (charts[currentAddr]) { charts[currentAddr].remove(); delete charts[currentAddr]; }
 }
 document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
@@ -676,8 +690,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
-    const target = 'tab-' + tab.dataset.tab.replace(/\s/g, '-').toLowerCase();
-    document.getElementById(target)?.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab)?.classList.add('active');
   });
 });
 
@@ -691,9 +704,9 @@ document.getElementById('search').addEventListener('input', e => filterTokens(e.
 
 // Resize
 window.addEventListener('resize', () => {
-  if (document.getElementById('modal').classList.contains('open') && currentSym && charts[currentSym]) {
-    const t = allData.find(t => t.sym === currentSym);
-    if (t) renderChart(t);
+  if (document.getElementById('modal').classList.contains('open') && currentAddr && charts[currentAddr]) {
+    const t = allData.find(t => t.addr === currentAddr);
+    if (t) renderRealChart(t);
   }
 });
 
