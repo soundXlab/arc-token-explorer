@@ -281,6 +281,7 @@ const TOKEN_DEFS = [
   {sym:"CRCL",addr:"0xd40ed72054bce37d2284bb315ffca122b690dc4b",desc:"Circle meme"},
   {sym:"ARCBAT",addr:"0xbe0cad585ea2d13de2f4e36376be755c0afd8b97",desc:"Slop video"},
   {sym:"ARCLAND",addr:"0xD49ccFE69C36D0A77A89389765b394dB847A155b",desc:"ArcLand NFT land"},
+  {sym:"SHARPFUN",addr:"0x99b37b7fccaa7a1030617b6195eb3045c523bb97",desc:"Launchpad 50% to holders"},
 ];
 
 // ── API ──
@@ -366,10 +367,23 @@ async function refreshAll() {
   const addrs = results.map(r=>r.addr.toLowerCase());
   const llama = await fetchLlamaPrices(addrs);
 
-  allData = results.filter(r=>r.dex||r.gecko && r.addr).map(r => {
+  allData = results.filter(r=>(r.dex||r.gecko) && r.addr).map(r => {
     const price = llama[r.addr.toLowerCase()] || r.gecko?.price || r.dex?.price;
     return {...r, price, mcap:r.gecko?.mcap||r.dex?.mcap, fdv:r.gecko?.fdv||r.dex?.fdv, vol:r.gecko?.vol24||r.dex?.vol, chg:r.gecko?.chg24??r.dex?.chg24, chg7d:r.gecko?.chg7d};
   }).sort((a,b)=>(b.mcap||0)-(a.mcap||0));
+  
+  // Also load discovered tokens from API that aren't in TOKEN_DEFS
+  try {
+    const disc = await api('/api/tokens');
+    const knownSyms = new Set(allData.map(t=>t.sym.toUpperCase()));
+    for (const t of disc) {
+      const sym = (t.symbol||'').toUpperCase();
+      if (!knownSyms.has(sym) && t.address && t.price > 0 && (t.mcap||0) > 1000) {
+        allData.push({sym, desc:t.name||sym, addr:t.address.toLowerCase(), price:t.price, mcap:t.mcap||0, fdv:t.fdv||0, vol:t.vol_24h||0, chg:t.chg_24h||0, chg7d:null, isKnown:false, dex:{}, gecko:{}});
+      }
+    }
+    allData.sort((a,b)=>(b.mcap||0)-(a.mcap||0));
+  } catch {}
 
   filteredData = [...allData];
   updateDiscovery();
@@ -540,7 +554,7 @@ async function openModal(idx) {
   document.getElementById('modal-title').textContent = `${t.sym} — Arc Explorer`;
   document.getElementById('modal').classList.add('open');
 
-  document.getElementById('modal-stats').innerHTML = [
+  const statsHtml = [
     {l:'Price',v:fmtPrice(t.price)},
     {l:'MCap',v:t.mcap?fmt(t.mcap):'—'},
     {l:'FDV',v:t.fdv?fmt(t.fdv):'—'},
@@ -552,11 +566,14 @@ async function openModal(idx) {
     {l:'Sells (24h)',v:t.dex?.sells24||'—'},
     {l:'Buy Ratio',v:t.dex?.buys24&&t.dex?.sells24?((t.dex.buys24/(t.dex.buys24+t.dex.sells24))*100).toFixed(0)+'%':'—'},
   ].map(s=>`<div class="mstat"><div class="mstat-l">${s.l}</div><div class="mstat-v ${s.c||''}">${s.v}</div></div>`).join('');
+  document.getElementById('modal-stats').innerHTML = statsHtml;
 
   document.getElementById('m-dex').href = t.dex?.url||'#';
   document.getElementById('m-gecko').href = `https://www.geckoterminal.com/arc/tokens/${t.addr}`;
   document.getElementById('m-explore').href = `https://explorer.arc.io/token/${t.addr}`;
 
+  // Wait for modal to be visible before creating chart
+  await new Promise(r => setTimeout(r, 50));
   await renderRealChart(t);
 }
 
@@ -573,13 +590,16 @@ async function renderRealChart(t) {
   if (price < 0.0001) precision = 10;
   const minMove = Math.pow(10, -precision);
 
+  // Ensure container has size before creating chart
+  if (box.clientWidth === 0) box.style.width = '100%';
+  const chartW = box.clientWidth || 700;
   const chart = LightweightCharts.createChart(box, {
     layout: { background: { color: '#0a0a15' }, textColor: '#555', fontSize: 11 },
     grid: { vertLines: { color: '#1a1a2e' }, horzLines: { color: '#1a1a2e' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
     rightAxis: { borderColor: '#1a1a2e', tickAlign: 'left' },
     timeScale: { borderColor: '#1a1a2e', timeVisible: true, secondsVisible: false, rightOffset: 2 },
-    width: box.clientWidth, height: 260
+    width: chartW, height: 260
   });
 
   const isUp = (t.chg || 0) >= 0;
@@ -640,6 +660,16 @@ async function renderRealChart(t) {
 
   chart.timeScale().fitContent();
   charts[t.addr] = chart;
+  
+  // Handle resize
+  const ro = new ResizeObserver(() => {
+    if (charts[t.addr]) {
+      charts[t.addr].applyOptions({ width: box.clientWidth || 700 });
+      chart.timeScale().fitContent();
+    }
+  });
+  ro.observe(box);
+  if (!t._ro) t._ro = ro;
 }
 
 function closeModal() {
